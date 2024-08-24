@@ -68,9 +68,8 @@ void printPlayerInfo(Player player, float *equipEnchant)
     printf("공격력: %.2f\n", player.power);
     printf("방어력: %.2f\n", player.depense);
     printf("골드: %d\n", player.gold);
-    printf("펫: %s, %d", player.pet.name, player.pet.skill);
-    printf("장비 인첸트: %f / %f / %f / %f / %f / %f", equipEnchant[0], equipEnchant[1], equipEnchant[2], equipEnchant[3], equipEnchant[4], equipEnchant[5]);
-    printf("\n");
+    printf("펫: %s, %d\n", player.pet.name, player.pet.skill);
+    printf("장비 인첸트: %f / %f / %f / %f / %f / %f\n", equipEnchant[0], equipEnchant[1], equipEnchant[2], equipEnchant[3], equipEnchant[4], equipEnchant[5]);
 }
 
 /* 몬스터 */
@@ -271,7 +270,7 @@ int enchantEquipment(Equipment *equip, Player *player, int index, float *enchant
         (scrollCnt)--; // 주문서 하나 차감
 
         // 강화 시도
-        printf("%s 강화 시도 중 ...", equip->name, index);
+        printf("%s 강화 시도 중 ...", equip->name);
         int succ = rand() % 100 + 1;
 
         if (isElixir == 1)
@@ -312,14 +311,18 @@ int enchantEquipment(Equipment *equip, Player *player, int index, float *enchant
 
 int main()
 {
-    int playerHP = 1000;
+    int playerHP = 100;
     int floor;
+    int tier2Price = 200;  // 2티어 장비 가격
+    int scrollPrice = 300; // 주문서 가격
+    char *petName[2] = {"도베르만", "비숑"};
 
     /* equipEnchant[] : 장비 강화 수치 배열 */
     // 장비 강화 시 업데이트
     // 티어 변경 시 업데이트 (0으로)
     // swordEnchant, armorEnchant, shoesEnchant, glovesEnchant, capeEnchant, maskEnchant
     float equipEnchant[6] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+
     /* names[] : 우리 반 친구들 이름 배열 */
     char *names[] = {"차수빈", "신정희", "이광영", "임민호", "곽성민", "신명호", "김민석", "최윤식", "김이삭", "김지섭", "김수현", "박성민", "정세현"};
     ////////////////////////////////////////////////
@@ -382,144 +385,468 @@ int main()
     // 스파토이 생성 (4, 5, 6층 y44 x22)
     Monster Spatoy = createMonster("스파토이", 260, 360, 32, 75, 5, 200, 0.2, 0.0, 0.2, 0.0, 0.0, 0.0, 5);
     printMonsterInfo(Spatoy);
+
     /* 보스 생성 */
     // 이름, 체력, 데미지min/max, 골드min/max, 마귀, 텔포, 2티어/3티어/4티어, 엘릭서 드롭률, 처치시총체력
-    // 네임드 생성 (1, 2, 3, 4, 5, 6, 7층)
+    // 보스1. 네임드 생성 (1, 2, 3, 4, 5, 6, 7층)
     Boss Friends[13];
     for (int i = 0; i < 13; i++)
     {
         Friends[i] = createBoss(names[i], jyb.health * 2, 100, 300, 5, 500, 0.2, 0.3, 0.2, 0.2, 0.0, 0.0, 20);
         printBossInfo(Friends[i]);
     }
-    // 바포메트(5,6,7층)
+    // 보스2. 바포메트(5,6,7층)
     Boss BPMT = createBoss("바포메트", jyb.health * 5, 180, 450, 5, 700, 0.2, 0.3, 0.0, 0.2, 0.05, 0.0, 20);
-    // 이동녀크(6층)
+    // 보스3. 이동녀크(6층)
     Boss LDNK = createBoss("이동녀크", jyb.health * 7, 300, 550, 5, 1000, 0.0, 0.3, 0.0, 0.2, 0.1, 0.1, 60);
-    // 최상달(7층)
+    // 보스4. 최상달(7층)
     Boss CSD = createBoss("최상달", jyb.health * 10, 500, 1300, 5, 3000, 0.0, 0.3, 0.0, 0.3, 0.2, 0.2, 100);
 
-    // for (int i = 1; i <= enchantScroll; i++)
+    // printf("////드워프의 제련소////\n");
+    // while(1)
     // {
-    //     int enchantIdx;
-    //     while (1)
+    //     int buyCnt;
+    //     while(1)
     //     {
-    //         printf("0:무기 1:갑옷 2:신발 3:장갑 4:망토 5:마스크\n입력: ");
-    //         scanf("%d", &enchantIdx);
-
-    //         if (enchantIdx == 0)
+    //         printf("장비 강화 주문서를 몇 개 구입하시겠습니까? : ");
+    //         scanf("%d", &buyCnt);
+    //         if (buyCnt < 0)
     //         {
-    //             enchantEquipment(&sword[jyb.swordIdx], &jyb, enchantIdx, equipEnchant, false);
-    //             break;
+    //             printf("\n다시 입력하세요.\n");
+    //             continue;
     //         }
-    //         else if (enchantIdx == 1)
+    //         else if (buyCnt * scrollPrice > jyb.gold)
     //         {
-    //             enchantEquipment(&armor[jyb.armorIdx], &jyb, enchantIdx, equipEnchant, false);
-    //             break;
+    //             printf("%d골드가 부족합니다.\n",buyCnt*scrollPrice);
+    //             continue;
     //         }
-    //         else if (enchantIdx == 2)
+    //         else if ( buyCnt > 0 && buyCnt * scrollPrice <= jyb.gold)
     //         {
-    //             enchantEquipment(&shoes[jyb.shoesIdx], &jyb, enchantIdx, equipEnchant, false);
-    //             break;
-    //         }
-    //         else if (enchantIdx == 3)
-    //         {
-    //             enchantEquipment(&gloves[jyb.glovesIdx], &jyb, enchantIdx, equipEnchant, false);
-    //             break;
-    //         }
-    //         else if (enchantIdx == 4)
-    //         {
-    //             enchantEquipment(&cape[jyb.capeIdx], &jyb, enchantIdx, equipEnchant, false);
-    //             break;
-    //         }
-    //         else if (enchantIdx == 5)
-    //         {
-    //             enchantEquipment(&mask[jyb.maskIdx], &jyb, enchantIdx, equipEnchant, false);
+    //             printf("구매가 완료되었습니다.\n");
+    //             jyb.cnt[6] = jyb.cnt[6] + buyCnt;
+    //             jyb.gold = jyb.gold - buyCnt * scrollPrice;
+    //             printf("<구매 후> 수량: %d, 골드 : %d\n", jyb.cnt[6], jyb.gold);
     //             break;
     //         }
     //         else
     //         {
-    //             printf("다시 입력하세요.\n"); // 종료하려면 q를 입력하세요 추가하기
-    //             continue;
+    //             break;
     //         }
     //     }
-
-    //     while (getchar() != '\n')
-    //         ;
-    //     calcPlayer(&jyb, playerHP, equipEnchant);
-    //     printPlayerInfo(jyb, equipEnchant);
     // }
 
+    // 강화 테스트
+    // while(1){
+    //     for (int i = 1; i <= enchantScroll; i++)
+    //     {
+    //         int enchantIdx;
+    //         while (1)
+    //         {
+    //             printf("0:무기 1:갑옷 2:신발 3:장갑 4:망토 5:마스크\n입력: ");
+    //             scanf("%d", &enchantIdx);
+    //             if (enchantIdx == 0)
+    //             {
+    //                 enchantEquipment(&sword[jyb.swordIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else if (enchantIdx == 1)
+    //             {
+    //                 enchantEquipment(&armor[jyb.armorIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else if (enchantIdx == 2)
+    //             {
+    //                 enchantEquipment(&shoes[jyb.shoesIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else if (enchantIdx == 3)
+    //             {
+    //                 enchantEquipment(&gloves[jyb.glovesIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else if (enchantIdx == 4)
+    //             {
+    //                 enchantEquipment(&cape[jyb.capeIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else if (enchantIdx == 5)
+    //             {
+    //                 enchantEquipment(&mask[jyb.maskIdx], &jyb, enchantIdx, equipEnchant, false);
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 printf("다시 입력하세요.\n"); // 종료하려면 q를 입력하세요 추가하기
+    //                 continue;
+    //             }
+    //         }
+    //         while (getchar() != '\n')
+    //             ;
+    //         calcPlayer(&jyb, playerHP, equipEnchant);
+    //         printPlayerInfo(jyb, equipEnchant);
+    //     }
+    // }
+
+    // 물약 복용 테스트
+    // while (1)
+    // {
+    //     int potionCnt;
+    //     jyb.hp = 150;
+    //     printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     while (red.count != 0)
+    //     {
+    //         printf("\n 빨간 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", red.plus, red.count);
+    //         scanf("%d", &potionCnt);
+    //         if (potionCnt > red.count)
+    //         {
+    //             printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", red.count);
+    //             potionCnt = red.count;
+    //         }
+    //         hpPlus(&red, &jyb, potionCnt);
+    //         printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     }
+    //     printf("\n-----------------------------------------------------");
+    //     jyb.hp = 150;
+    //     printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     while (orange.count != 0)
+    //     {
+    //         printf("\n주황 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", orange.plus, orange.count);
+    //         scanf("%d", &potionCnt);
+    //         if (potionCnt > orange.count)
+    //         {
+    //             printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", orange.count);
+    //             potionCnt = orange.count;
+    //         }
+    //         hpPlus(&orange, &jyb, potionCnt);
+    //         printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     }
+    //     printf("\n-----------------------------------------------------");
+    //     jyb.hp = 150;
+    //     printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     while (clear.count != 0)
+    //     {
+    //         printf("\n 맑은 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", clear.plus, clear.count);
+    //         scanf("%d", &potionCnt);
+    //         if (potionCnt > clear.count)
+    //         {
+    //             printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", clear.count);
+    //             potionCnt = clear.count;
+    //         }
+    //         hpPlus(&clear, &jyb, potionCnt);
+    //         printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     }
+    //     printf("\n-----------------------------------------------------");
+    //     jyb.hp = 150;
+    //     printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     while (strong.count != 0)
+    //     {
+    //         printf("\n 고농축 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", strong.plus, strong.count);
+    //         scanf("%d", &potionCnt);
+    //         if (potionCnt > strong.count)
+    //         {
+    //             printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", strong.count);
+    //             potionCnt = strong.count;
+    //         }
+    //         hpPlus(&strong, &jyb, potionCnt);
+    //         printf("\n용복이 체력 : %.2lf", jyb.hp);
+    //     }
+    //     break;
+    // }
+
+    printf("////판도라의 상점////\n");
     while (1)
     {
-        int potionCnt;
-        jyb.hp = 150;
-        printf("\n용복이 체력 : %.2lf", jyb.hp);
-        while (red.count != 0)
+        printf(" 1  %s (%d골드)\n", red.name, red.price);
+        printf(" 2  %s (%d골드)\n", orange.name, orange.price);
+        printf(" 3  %s (%d골드)\n", clear.name, clear.price);
+        printf(" 4  %s (%d골드)\n", strong.name, strong.price);
+        printf(" 5  %s (%d골드)\n", sword[2].name, tier2Price);
+        printf(" 6  %s (%d골드)\n", armor[2].name, tier2Price);
+        printf(" 7  %s (%d골드)\n", shoes[2].name, tier2Price);
+        printf(" 8  %s (%d골드)\n", gloves[2].name, tier2Price);
+        printf(" 9  %s (%d골드)\n", cape[2].name, tier2Price);
+        printf(" 10 %s (%d골드)\n", mask[2].name, tier2Price);
+        printf(" 11 마을 귀환 주문서 (%d골드)\n", scrollPrice);
+        printf("------------------------------\n");
+        int buyIdx, buyCnt;
+        int potionPrice[4] = {red.price, orange.price, clear.price, strong.price};
+        printf("구매할 아이템의 번호를 입력하세요 (종료하려면 q를 입력하세요.) : ");
+        scanf("%d", &buyIdx);
+        if (0 < buyIdx && buyIdx < 5)
         {
-            printf("\n 빨간 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", red.plus, red.count);
-            scanf("%d", &potionCnt);
-            if (potionCnt > red.count)
+            while (1)
             {
-                printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", red.count);
-                potionCnt= red.count;
+                printf("<구매 전> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
+                printf("구매할 수량을 입력하세요 : ");
+                scanf("%d", &buyCnt);
+                if (buyCnt < 0)
+                {
+                    printf("\n다시 입력하세요.\n");
+                    continue;
+                }
+                else if (buyCnt * potionPrice[buyIdx - 1] > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    continue;
+                }
+                else if (buyCnt * potionPrice[buyIdx - 1] <= jyb.gold && buyCnt > 0)
+                {
+                    printf("구매가 완료되었습니다.\n");
+                    jyb.cnt[buyIdx] = jyb.cnt[buyIdx] + buyCnt;
+                    jyb.gold = jyb.gold - buyCnt * potionPrice[buyIdx - 1];
+                    printf("<구매 후> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
+                    break;
+                }
+                else
+                {
+                    break;
+                }
             }
-
-            hpPlus(&red, &jyb, potionCnt);
-            printf("\n용복이 체력 : %.2lf", jyb.hp);
         }
-
-        printf("\n-----------------------------------------------------");
-        jyb.hp = 150;
-        printf("\n용복이 체력 : %.2lf", jyb.hp);
-        while (orange.count != 0)
+        else if (buyIdx == 5) // 무기 구매
         {
-            printf("\n주황 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", orange.plus, orange.count);
-            scanf("%d", &potionCnt);
-            if (potionCnt > orange.count)
+            if (jyb.swordIdx > 0)
             {
-                printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", orange.count);
-                potionCnt= orange.count;
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
             }
-
-            hpPlus(&orange, &jyb, potionCnt);
-            printf("\n용복이 체력 : %.2lf", jyb.hp);
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.swordIdx += 1;
+                    equipEnchant[0] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    break;
+                }
+            }
         }
-
-        printf("\n-----------------------------------------------------");
-        jyb.hp = 150;
-        printf("\n용복이 체력 : %.2lf", jyb.hp);
-        while (clear.count != 0)
+        else if (buyIdx == 6) // 갑옷 구매
         {
-            printf("\n 맑은 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", clear.plus, clear.count);
-            scanf("%d", &potionCnt);
-            if (potionCnt > clear.count)
+            if (jyb.armorIdx > 0)
             {
-                printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", clear.count);
-                potionCnt= clear.count;
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
             }
-            hpPlus(&clear, &jyb, potionCnt);
-            printf("\n용복이 체력 : %.2lf", jyb.hp);
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.armorIdx += 1;
+                    equipEnchant[1] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    break;
+                }
+            }
         }
-
-        printf("\n-----------------------------------------------------");
-        jyb.hp = 150;
-        printf("\n용복이 체력 : %.2lf", jyb.hp);
-        while (strong.count != 0)
+        else if (buyIdx == 7) // 신발 구매
         {
-            printf("\n 고농축 포션 증가량 : %d, 포션 개수 : %d\n 몇 개 사용하시겠습니까? : ", strong.plus, strong.count);
-            scanf("%d", &potionCnt);
-            if (potionCnt > strong.count)
+            if (jyb.shoesIdx > 0)
             {
-                printf("\n사용할 포션이 부족합니다. %d개만 사용됩니다.", strong.count);
-                potionCnt= strong.count;
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
             }
-
-            hpPlus(&strong, &jyb, potionCnt);
-            printf("\n용복이 체력 : %.2lf", jyb.hp);
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.shoesIdx += 1;
+                    equipEnchant[2] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    break;
+                }
+            }
         }
-
+        else if (buyIdx == 8) // 장갑 구매
+        {
+            if (jyb.glovesIdx > 0)
+            {
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
+            }
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.swordIdx += 1;
+                    equipEnchant[0] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    break;
+                }
+            }
+        }
+        else if (buyIdx == 9) // 망토 구매
+        {
+            if (jyb.capeIdx > 0)
+            {
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
+            }
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.capeIdx += 1;
+                    equipEnchant[0] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    break;
+                }
+            }
+        }
+        else if (buyIdx == 10) // 마스크 구매
+        {
+            if (jyb.swordIdx > 0)
+            {
+                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+                break;
+            }
+            else
+            {
+                if (tier2Price > jyb.gold)
+                {
+                    printf("골드가 부족합니다.\n");
+                    break;
+                }
+                else
+                {
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+                    printf("구매가 완료되었습니다.\n");
+                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
+                    jyb.swordIdx += 1;
+                    equipEnchant[0] = 1.0;
+                    jyb.gold = jyb.gold - tier2Price;
+                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+                    calcPlayer(&jyb, playerHP, equipEnchant);
+                    printPlayerInfo(jyb, equipEnchant);
+                    break;
+                }
+            }
+        }
+        else if (buyIdx == 11) // 주문서
+        {
+            printf("구매 전 : 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
+            if (scrollPrice > jyb.gold)
+            {
+                printf("골드가 부족합니다.\n");
+                break;
+            }
+            else
+            {
+                jyb.cnt[4] += 1;
+                printf("구매가 완료되었습니다. 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
+            }
+        }
+        else
+        {
+            printf("\n다시 입력하세요.\n");
+            continue;
+        }
         break;
     }
+
+    // 펫상점
+    // while (1)
+    // {
+    //     Pet p;
+    //     int petIdx;
+    //     printf("------------------------------\n");
+    //     printf("1. %-4s, 능력: 공격력+2  \n", petName[0]);
+    //     printf("2. %-4s, 능력: 데미지감소-2  \n", petName[1]);
+    //     printf("------------------------------\n");
+    //     printf("펫을 선택하세요 : ");
+    //     scanf("%d", &petIdx);
+    //     printf("\n------------------------------");
+    //     if (petIdx == 1 || petIdx == 2)
+    //     {
+    //         jyb.pet.name = petName[petIdx - 1];
+    //         jyb.pet.skill = 2;
+    //         printf("\n");
+    //         calcPlayer(&jyb, playerHP, equipEnchant);
+    //         printPlayerInfo(jyb, equipEnchant);
+    //         break;
+    //     }
+    //     else
+    //     {
+    //         printf("다시 입력하세요.\n");
+    //         continue;
+    //     }
+    // }
+
+    // 야매레벨법사 테스트
+    // while (1)
+    // {
+    //     printf("\n1에서 10사이로 레벨이 설정됩니다. 진행하시겠습니까?");
+    //     int lv;
+    //     printf(" (현재 레벨: %d)\n---------------------------------------------------------------\n", jyb.level);
+    //     lv = rand() % 10 + 1;
+    //     printf("우하하하 이제부터 너의 레벨은 %d!!!!\n---------------------------------------------------------------\n", lv);
+    //     jyb.level = lv;
+    //     printf("현재 레벨: %d\n", jyb.level);
+    //     break;
+    // }
+
 
     return 0;
 }
