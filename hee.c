@@ -56,7 +56,7 @@ void calcPlayer(Player *jyb, int playerHealth, float *equipEnchant)
     jyb->depense = depenseStat[jyb->armorIdx] * equipEnchant[1] + depenseStat[jyb->shoesIdx] * equipEnchant[2] +
                    depenseStat[jyb->glovesIdx] * equipEnchant[3] + depenseStat[jyb->capeIdx] * equipEnchant[4] + depenseStat[jyb->maskIdx] * equipEnchant[5] +
                    petDefense + levelPlus;
-    jyb->health = playerHealth + levelPlus;
+    jyb->health = playerHealth;
     // printf("%s 공격력 : %d, 방어력 : %d, 체력 : %d\n", jyb->name, jyb->power, jyb->depense, jyb->health);
 }
 
@@ -64,65 +64,52 @@ void printPlayerInfo(Player player, float *equipEnchant)
 {
     printf("사용자 이름: %s\n", player.name);
     printf("레벨: %d\n", player.level);
-    printf("체력: %lf\n", player.health);
+    printf("체력: %.2lf\n", player.health);
     printf("공격력: %.2f\n", player.power);
     printf("방어력: %.2f\n", player.depense);
     printf("골드: %d\n", player.gold);
     printf("펫: %s, %d\n", player.pet.name, player.pet.skill);
-    printf("장비 인첸트: %f / %f / %f / %f / %f / %f\n", equipEnchant[0], equipEnchant[1], equipEnchant[2], equipEnchant[3], equipEnchant[4], equipEnchant[5]);
+    printf("장비 인첸트: %.2f / %.2f / %.2f / %.2f / %.2f / %.2f\n", equipEnchant[0], equipEnchant[1], equipEnchant[2], equipEnchant[3], equipEnchant[4], equipEnchant[5]);
 }
 
 /* 몬스터 */
 typedef struct
 {
-    char *name;
-    // 체력 범위, 체력
-    int minHealth;
-    int maxHealth;
-    double health; // 총 체력
-    double hp;     // 체력
-    // 1회 공격 데미지 범위
-    int minDamage;
-    int maxDamage;
-    // 골드 드롭 범위
-    int minGold;
-    int maxGold;
-    // 마귀, 이동 주문서 드롭률
-    float returnRate;
-    float teleportRate;
-    // 2티어 ~ 4티어 드롭률
-    float tier2Rate;
-    float tier3Rate;
-    float tier4Rate;
-    // 엘릭서 드롭률
-    float elixirRate;
-    // 처치 시 총 체력 상승률
-    float healthRate;
+    char *name;         // 이름
+    int minHealth;      // 체력 범위 min
+    int maxHealth;      // 체력 범위 max
+    double health;      // 총 체력
+    double hp;          // 체력
+    int minDamage;      // 1회 공격 데미지 범위 min
+    int maxDamage;      // 1회 공격 데미지 범위 max
+    int minGold;        // 골드 드롭 범위 min
+    int maxGold;        // 골드 드롭 범위 max
+    float returnRate;   // 마귀 주문서 드롭률
+    float teleportRate; // 이동 주문서 드롭률
+    float tier2Rate;    // 2티어 드롭률
+    float tier3Rate;    // 3티어 드롭률
+    float tier4Rate;    // 4티어 드롭률
+    float elixirRate;   // 엘릭서 드롭률
+    float healthRate;   // 처치 시 총 체력 상승률
 } Monster;
 
 /* 보스 */
 typedef struct
 {
-    char *name;
-    double health; // 총 체력
-    double hp;     // 체력
-    // 1회 공격 데미지 범위
-    int minDamage;
-    int maxDamage;
-    // 골드 드롭 범위
-    int minGold;
-    int maxGold;
-    // 마귀, 이동 주문서 드롭률
-    float returnRate;
-    float teleportRate;
-    // 2티어 ~ 4티어 드롭률
-    float tier2Rate;
-    float tier3Rate;
-    float tier4Rate;
-    // 엘릭서 드롭률
-    float elixirRate;
-    // 처치 시 총 체력 상승률
-    float healthRate;
+    char *name;         // 이름
+    double health;      // 총 체력
+    double hp;          // 체력
+    int minDamage;      // 1회 공격 데미지 범위 min
+    int maxDamage;      // 1회 공격 데미지 범위 max
+    int minGold;        // 골드 드롭 범위 min
+    int maxGold;        // 골드 드롭 범위 max
+    float returnRate;   // 마귀 주문서 드롭률
+    float teleportRate; // 이동 주문서 드롭률
+    float tier2Rate;    // 2티어 드롭률
+    float tier3Rate;    // 3티어 드롭률
+    float tier4Rate;    // 4티어 드롭률
+    float elixirRate;   // 엘릭서 드롭률
+    float healthRate;   // 처치 시 총 체력 상승률
 } Boss;
 
 /* 몬스터 > 생성 함수 */
@@ -179,7 +166,7 @@ Boss createBoss(char *name, double health, int minDamage, int maxDamage, int min
 void printMonsterInfo(Monster monster)
 {
     printf("몬스터: %s\n", monster.name);
-    printf("체력: %lf\n", monster.health);
+    printf("체력: %.2lf\n", monster.health);
     printf("공격력: %d\n", rand() % (monster.maxDamage - monster.minDamage + 1) + monster.minDamage);
     printf("골드 드롭: %d\n", rand() % (monster.maxGold - monster.minGold + 1) + monster.minGold);
     printf("마을이동주문서 드롭률: %.2f%%\n", monster.returnRate * 100);
@@ -190,7 +177,7 @@ void printMonsterInfo(Monster monster)
 void printBossInfo(Boss boss)
 {
     printf("보스: %s\n", boss.name);
-    printf("체력: %lf\n", boss.health);
+    printf("체력: %.2lf\n", boss.health);
     printf("공격력: %d\n", rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage);
     printf("골드 드롭: %d\n", rand() % (boss.maxGold - boss.minGold + 1) + boss.minGold);
     printf("마을이동주문서 드롭률: %.2f%%\n", boss.returnRate * 100);
@@ -223,7 +210,13 @@ void hpPlus(Potion *potion, Player *jyb, int use)
     for (int i = 0; i < use; i++)
     {
         potion->count--;
-        jyb->hp += potion->plus;
+        if(jyb->health < (jyb->hp)+(potion->plus))
+        {
+            jyb->hp = jyb->health;
+        }else
+        {
+            jyb->hp += potion->plus;
+        }
     }
 }
 
@@ -248,6 +241,414 @@ float calcPerformance(Equipment *equip)
         // return equip->basicPerformance * (1.0 + (equip->enchantLV * 0.1));
         return 1.0 + equip->enchantLV * 0.1;
     }
+}
+
+void bossClear(Boss *boss, Player *player, Equipment *sword, Equipment *armor, Equipment *shoes, Equipment *glove, Equipment *cape, Equipment *mask)
+{
+    int succ, equip;
+
+    printf("%s를 물리쳤습니다.\n", boss->name);
+
+    printf("//맵(좌표) 값 0으로 바꾸기//\n");
+
+    // 골드 획득
+    int gold = rand() % (boss->maxGold - boss->minGold + 1) + boss->minGold;
+    printf("%d 골드를 획득했습니다.\n", gold);
+    player->gold += gold;
+
+    // 마을이동주문서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= boss->returnRate * 100)
+    {
+        printf("마을이동주문서를 획득했습니다.\n");
+        player->cnt[4] += 1;
+    }
+
+    // 이동 주문서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= boss->teleportRate * 100)
+    {
+        printf("이동주문서를 획득했습니다.\n");
+        player->cnt[5] += 1;
+    }
+
+    // 2티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (boss->tier2Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx < 1)
+            {
+                player->swordIdx = 1;
+                printf("2티어 무기(%s) 획득!\n", sword[1].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx < 1)
+            {
+                player->armorIdx = 1;
+                printf("2티어 갑옷(%s) 획득!\n", armor[1].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx < 1)
+            {
+                player->shoesIdx = 1;
+                printf("2티어 신발(%s) 획득!\n", shoes[1].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx < 1)
+            {
+                player->glovesIdx = 1;
+                printf("2티어 장갑(%s) 획득!\n", glove[1].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx < 1)
+            {
+                player->capeIdx = 1;
+                printf("2티어 망토(%s) 획득!\n", cape[1].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx < 1)
+            {
+                player->maskIdx = 1;
+                printf("2티어 마스크(%s) 획득!\n", mask[1].name);
+            }
+            break;
+        }
+    }
+
+    // 3티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (boss->tier3Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx == 1)
+            {
+                player->swordIdx = 2;
+                printf("3티어 무기(%s) 획득!\n", sword[2].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx == 1)
+            {
+                player->armorIdx = 2;
+                printf("3티어 갑옷(%s) 획득!\n", armor[2].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx == 1)
+            {
+                player->shoesIdx = 2;
+                printf("3티어 신발(%s) 획득!\n", shoes[2].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx == 1)
+            {
+                player->glovesIdx = 2;
+                printf("3티어 장갑(%s) 획득!\n", glove[2].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx == 1)
+            {
+                player->capeIdx = 2;
+                printf("3티어 망토(%s) 획득!\n", cape[2].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx == 1)
+            {
+                player->maskIdx = 2;
+                printf("3티어 마스크(%s) 획득!\n", mask[2].name);
+            }
+            break;
+        }
+    }
+
+    // 4 티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (boss->tier4Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx == 2)
+            {
+                player->swordIdx = 3;
+                printf("4티어 무기(%s) 획득!\n", sword[3].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx == 2)
+            {
+                player->armorIdx = 3;
+                printf("4티어 갑옷(%s) 획득!\n", armor[3].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx == 2)
+            {
+                player->shoesIdx = 3;
+                printf("4티어 신발(%s) 획득!\n", shoes[3].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx == 2)
+            {
+                player->glovesIdx = 3;
+                printf("4티어 장갑(%s) 획득!\n", glove[3].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx == 2)
+            {
+                player->capeIdx = 3;
+                printf("4티어 망토(%s) 획득!\n", cape[3].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx == 2)
+            {
+                player->maskIdx = 3;
+                printf("4티어 마스크(%s) 획득!\n", mask[3].name);
+            }
+            break;
+        }
+    }
+
+    // 엘릭서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= boss->elixirRate * 100)
+    {
+        printf("엘릭서를 획득했습니다.\n");
+        player->cnt[7] += 1;
+    }
+
+    // 총 체력 증가
+    player->health *= (1 + (0.01 * boss->healthRate));
+    printf("총 체력이 증가하여 %.2lf가 되었습니다.(hp: %.2lf)", player->health, player->hp);
+}
+
+void bossExit(Boss *boss)
+{
+    // 보스 체력 리셋
+    boss->hp = boss->health;
+}
+
+void monsterClear(Monster *monster, Player *player, Equipment *sword, Equipment *armor, Equipment *shoes, Equipment *glove, Equipment *cape, Equipment *mask)
+{
+    int succ, equip;
+
+    printf("%s를 물리쳤습니다.\n", monster->name);
+
+    printf("//맵(좌표) 값 0으로 바꾸기//\n");
+
+    // 골드 획득
+    int gold = rand() % (monster->maxGold - monster->minGold + 1) + monster->minGold;
+    printf("%d 골드를 획득했습니다.\n", gold);
+    player->gold += gold;
+
+    // 마을이동주문서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= monster->returnRate * 100)
+    {
+        printf("마을이동주문서를 획득했습니다.\n");
+        player->cnt[4] += 1;
+    }
+
+    // 이동 주문서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= monster->teleportRate * 100)
+    {
+        printf("이동주문서를 획득했습니다.\n");
+        player->cnt[5] += 1;
+    }
+
+    // 2티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (monster->tier2Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx < 1)
+            {
+                player->swordIdx = 1;
+                printf("2티어 무기(%s) 획득!\n", sword[1].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx < 1)
+            {
+                player->armorIdx = 1;
+                printf("2티어 갑옷(%s) 획득!\n", armor[1].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx < 1)
+            {
+                player->shoesIdx = 1;
+                printf("2티어 신발(%s) 획득!\n", shoes[1].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx < 1)
+            {
+                player->glovesIdx = 1;
+                printf("2티어 장갑(%s) 획득!\n", glove[1].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx < 1)
+            {
+                player->capeIdx = 1;
+                printf("2티어 망토(%s) 획득!\n", cape[1].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx < 1)
+            {
+                player->maskIdx = 1;
+                printf("2티어 마스크(%s) 획득!\n", mask[1].name);
+            }
+            break;
+        }
+    }
+
+    // 3티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (monster->tier3Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx == 1)
+            {
+                player->swordIdx = 2;
+                printf("3티어 무기(%s) 획득!\n", sword[2].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx == 1)
+            {
+                player->armorIdx = 2;
+                printf("3티어 갑옷(%s) 획득!\n", armor[2].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx == 1)
+            {
+                player->shoesIdx = 2;
+                printf("3티어 신발(%s) 획득!\n", shoes[2].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx == 1)
+            {
+                player->glovesIdx = 2;
+                printf("3티어 장갑(%s) 획득!\n", glove[2].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx == 1)
+            {
+                player->capeIdx = 2;
+                printf("3티어 망토(%s) 획득!\n", cape[2].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx == 1)
+            {
+                player->maskIdx = 2;
+                printf("3티어 마스크(%s) 획득!\n", mask[2].name);
+            }
+            break;
+        }
+    }
+
+    // 4 티어 장비 획득
+    succ = rand() % 100 + 1;
+    equip = rand() % 6;
+    if (monster->tier4Rate * 100)
+    {
+        switch (equip)
+        {
+        case 0:
+            if (player->swordIdx == 2)
+            {
+                player->swordIdx = 3;
+                printf("4티어 무기(%s) 획득!\n", sword[3].name);
+            }
+            break;
+        case 1:
+            if (player->armorIdx == 2)
+            {
+                player->armorIdx = 3;
+                printf("4티어 갑옷(%s) 획득!\n", armor[3].name);
+            }
+            break;
+        case 2:
+            if (player->shoesIdx == 2)
+            {
+                player->shoesIdx = 3;
+                printf("4티어 신발(%s) 획득!\n", shoes[3].name);
+            }
+            break;
+        case 3:
+            if (player->glovesIdx == 2)
+            {
+                player->glovesIdx = 3;
+                printf("4티어 장갑(%s) 획득!\n", glove[3].name);
+            }
+            break;
+        case 4:
+            if (player->capeIdx == 2)
+            {
+                player->capeIdx = 3;
+                printf("4티어 망토(%s) 획득!\n", cape[3].name);
+            }
+            break;
+        case 5:
+            if (player->maskIdx == 2)
+            {
+                player->maskIdx = 3;
+                printf("4티어 마스크(%s) 획득!\n", mask[3].name);
+            }
+            break;
+        }
+    }
+
+    // 엘릭서 획득
+    succ = rand() % 100 + 1;
+    if (succ <= monster->elixirRate * 100)
+    {
+        printf("엘릭서를 획득했습니다.\n");
+        player->cnt[7] += 1;
+    }
+
+    // 총 체력 증가
+    player->health *= (1 + (0.01 * monster->healthRate));
+    printf("총 체력이 증가하여 %.2lf가 되었습니다.(hp: %.2lf)", player->health, player->hp);
+}
+
+void monsterExit(Monster *monster)
+{
+    // 몬스터 체력 리셋
+    monster->hp = monster->health;
 }
 
 /* 아이템 > 장비 >> 장비 강화 함수 */
@@ -355,7 +756,7 @@ int main()
     Equipment shoes[4] = {{"기본 장화", 0, 1.0}, {"슬리퍼", 0, 4.0}, {"운동화", 0, 8.0}, {"에어조단", 0, 13.20}};
     Equipment gloves[4] = {{"기본 장갑", 0, 1.0}, {"고무 장갑", 0, 4.0}, {"면 장갑", 0, 8.0}, {"가죽 장갑", 0, 13.20}};
     Equipment cape[4] = {{"기본 망토", 0, 1.0}, {"면 망토", 0, 4.0}, {"비단 망토", 0, 8.0}, {"방탄 망토", 0, 13.20}};
-    Equipment mask[4] = {{"기본 마스크", 0, 1.0}, {"k80 마스크", 0, 4.0}, {"k94 마스크", 0, 8.0}, {"타이거 마스크", 0, 13.20}};
+    Equipment mask[4] = {{"기본 마스크", 0, 1.0}, {"KF80 마스크", 0, 4.0}, {"KF94 마스크", 0, 8.0}, {"타이거 마스크", 0, 13.20}};
 
     //////////////////////////////////////////////////////////////////////
 
@@ -365,42 +766,1761 @@ int main()
     //                    레벨, 체력, 공격력, 방어력, 골드, cnt[8], pet, 장비 티어<무기, 갑옷, 신발, 장갑, 망토, 마스크>
     Player jyb = {"전용복", 1, playerHP, playerHP, 0.0, 0.0, 300, {red.count, orange.count, clear.count, strong.count, returnScroll, teleportScroll, enchantScroll, elixir}, {heroAttack, heroDefense, heroAvoid}, {"없음", 0}, 0, 0, 0, 0, 0, 0};
     calcPlayer(&jyb, playerHP, equipEnchant);
-
+    jyb.hp = jyb.health;
     printPlayerInfo(jyb, equipEnchant);
-    //{"없음", 0}
+
     /* 몬스터 생성 */
-    // 이름, 체력min/max, 데미지min/max, 골드min/max, <드롭률>마귀/텔포줌/2티어/3티어/4티어/엘릭서, 체력상승률
-    // 오크 전사 생성 (1층 y44 x22)
-    Monster orcWarrior = createMonster("오크 전사", 50, 100, 10, 15, 5, 30, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 1);
-    printMonsterInfo(orcWarrior);
-    // 좀비 생성 (2, 3, 4층 y44 x22)
-    Monster zombie = createMonster("좀비", 50, 180, 17, 30, 5, 60, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 2);
-    printMonsterInfo(zombie);
-    // 구울 생성 (3, 4, 5, 6층 y44 x22)
-    Monster ghoul = createMonster("구울", 120, 280, 20, 45, 5, 100, 0.2, 0.0, 0.2, 0.0, 0.0, 0.0, 3);
-    printMonsterInfo(ghoul);
-    // 해골 생성 (4, 5, 6층 y44 x22)
-    Monster Skeleton = createMonster("해골", 120, 280, 20, 45, 5, 100, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 3);
-    printMonsterInfo(Skeleton);
-    // 스파토이 생성 (4, 5, 6층 y44 x22)
-    Monster Spatoy = createMonster("스파토이", 260, 360, 32, 75, 5, 200, 0.2, 0.0, 0.2, 0.0, 0.0, 0.0, 5);
-    printMonsterInfo(Spatoy);
+    Monster orcWarrior; // 오크 전사 
+    Monster zombie;     // 좀비 
+    Monster ghoul;      // 구울
+    Monster Skeleton;   // 해골 
+    Monster Spatoy;     // 스파토이
 
     /* 보스 생성 */
-    // 이름, 체력, 데미지min/max, 골드min/max, 마귀, 텔포, 2티어/3티어/4티어, 엘릭서 드롭률, 처치시총체력
-    // 보스1. 네임드 생성 (1, 2, 3, 4, 5, 6, 7층)
-    Boss Friends[13];
+    Boss Friends[13]; // 우리반친구들
     for (int i = 0; i < 13; i++)
     {
         Friends[i] = createBoss(names[i], jyb.health * 2, 100, 300, 5, 500, 0.2, 0.3, 0.2, 0.2, 0.0, 0.0, 20);
-        printBossInfo(Friends[i]);
+        //printBossInfo(Friends[i]);
     }
-    // 보스2. 바포메트(5,6,7층)
-    Boss BPMT = createBoss("바포메트", jyb.health * 5, 180, 450, 5, 700, 0.2, 0.3, 0.0, 0.2, 0.05, 0.0, 20);
-    // 보스3. 이동녀크(6층)
-    Boss LDNK = createBoss("이동녀크", jyb.health * 7, 300, 550, 5, 1000, 0.0, 0.3, 0.0, 0.2, 0.1, 0.1, 60);
-    // 보스4. 최상달(7층)
-    Boss CSD = createBoss("최상달", jyb.health * 10, 500, 1300, 5, 3000, 0.0, 0.3, 0.0, 0.3, 0.2, 0.2, 100);
+    // 보스2. 바포메트
+    Boss BPMT;
+    // 보스3. 이동녀크
+    Boss LDNK;
+    // 보스4. 최상달
+    Boss CSD;
+
+    /* 전투 모드 */
+    // printf("체력: %.2lf\n", monster.health);
+    // printf("공격력: %d\n", rand() % (monster.maxDamage - monster.minDamage + 1) + monster.minDamage);
+    // printf("골드 드롭: %d\n", rand() % (monster.maxGold - monster.minGold + 1) + monster.minGold);
+    
+    int input, damage, run, potionCnt;
+    bool round2;
+    bool bAttack = false, bDepense = false, bAvoid = false;
+    Monster mon;
+    Boss boss;
+    for (int mark = 75; mark < 76; mark++)
+    {
+        switch (mark)
+        {
+        case 70: // printf("오크 나와!!\n");
+            orcWarrior = createMonster("오크 전사", 50, 100, 10, 15, 5, 30, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 1);
+            // printMonsterInfo(orcWarrior);
+            mon = orcWarrior;
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", mon.name, mon.hp, mon.health);
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+            printf(">> 1 : 공격 / 2 : 도망가기\n");
+            printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+            printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+            while (mon.hp > 0 && jyb.hp > 0)
+            {
+                printf(">> 입력 : ");
+                scanf("%d", &input);
+                printf("\n");
+                if (input >= 0 && input < 10)
+                {
+                    switch (input)
+                    {
+                    case 1: // 공격
+                        if (bAttack)
+                        {
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            mon.hp -= damage;
+                            printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        }
+                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                        mon.hp -= damage;
+                        printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        if (mon.hp > 0)
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                        }
+                        if (jyb.hp <= 0)
+                        {
+                            printf("플레이어 사망\n");
+                        }
+                        break;
+                    case 2: // 도망 50%
+                        run = rand() % 2;
+                        if (run == 1)
+                        {
+                            printf("도망 성공, 위치 이동 시키기\n");
+                        }
+                        else
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }                            
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                            if (jyb.hp > 0)
+                            {
+                                if (bAttack)
+                                {
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    mon.hp -= damage;
+                                    printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                                }
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                mon.hp -= damage;
+                                printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                        }
+                        break;
+                    case 3: // 빨간 포션
+                        if (jyb.cnt[0] >= 1)
+                        {
+                            printf("빨간 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[0] -= 1;
+                            hpPlus(&red, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 4: // 주황 포션
+                        if (jyb.cnt[1] >= 1)
+                        {
+                            printf("주황 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[1] -= 1;
+                            hpPlus(&orange, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 5: // 맑은 포션
+                        if (jyb.cnt[2] >= 1)
+                        {
+                            printf("맑은 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[2] -= 1;
+                            hpPlus(&clear, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 6: // 고농축 포션
+                        if (jyb.cnt[3] >= 1)
+                        {
+                            printf("고농축 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[3] -= 1;
+                            hpPlus(&strong, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 7: // 공격 히어로
+                        if (jyb.heroCnt[0] >= 1)
+                        {
+                            bAttack = true;
+                            printf("공격 히어로를 소환했습니다\n");
+                            printf("공격력이 두 배로 증가합니다.\n");
+                        }
+                        break;
+                    case 8: // 방어 히어로
+                        if (jyb.heroCnt[1] >= 1)
+                        {
+                            bDepense = true;
+                            printf("방어 히어로를 소환했습니다.\n");
+                            printf("데미지를 입지 않습니다.\n");
+                        }
+                        break;
+                    case 9: // 회피 히어로
+                        if (jyb.heroCnt[2] >= 1)
+                        {
+                            printf("회피 히어로를 소환했습니다.\n");
+                            printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                            printf("위치 이동 시키기\n");
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    printf("다시 입력하세요. \n");
+                }
+            }
+            if (mon.hp <= 0) // 플레이어가 이겼을 때
+            {
+                monsterClear(&mon, &jyb, sword, armor, shoes, gloves, cape, mask);
+            }
+            else if (jyb.hp <= 0) // 플레이어가 졌을 때
+            {
+                printf("체력 얼마 남기고 마을로 이동\n");
+            }
+            monsterExit(&mon);
+            bAttack = bDepense = bAvoid = false;
+            break;
+        case 71: // printf("좀비 나와!!\n");
+            zombie = createMonster("좀비", 50, 180, 17, 30, 5, 60, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 2);
+            //printMonsterInfo(zombie);
+            mon = zombie;
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", mon.name, mon.hp, mon.health);
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+            printf(">> 1 : 공격 / 2 : 도망가기\n");
+            printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+            printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+            while (mon.hp > 0 && jyb.hp > 0)
+            {
+                printf(">> 입력 : ");
+                scanf("%d", &input);
+                printf("\n");
+                if (input >= 0 && input < 10)
+                {
+                    switch (input)
+                    {
+                    case 1: // 공격
+                        if (bAttack)
+                        {
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            mon.hp -= damage;
+                            printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        }
+                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                        mon.hp -= damage;
+                        printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        if (mon.hp > 0)
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            // printf("*******damage min : %d max : %d, damage: %d\n", mon.maxDamage, mon.minDamage, damage);
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }                            
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                        }
+                        if (jyb.hp <= 0)
+                        {
+                            printf("플레이어 사망\n");
+                        }
+                        break;
+                    case 2: // 도망 50%
+                        run = rand() % 2;
+                        if (run == 1)
+                        {
+                            printf("도망 성공, 위치 이동 시키기\n");
+                        }
+                        else
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }                            
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                            if (jyb.hp > 0)
+                            {
+                                if (bAttack)
+                                {
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    mon.hp -= damage;
+                                    printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                                }
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                mon.hp -= damage;
+                                printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                        }
+                        break;
+                    case 3: // 빨간 포션
+                        if (jyb.cnt[0] >= 1)
+                        {
+                            printf("빨간 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[0] -= 1;
+                            hpPlus(&red, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 4: // 주황 포션
+                        if (jyb.cnt[1] >= 1)
+                        {
+                            printf("주황 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[1] -= 1;
+                            hpPlus(&orange, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 5: // 맑은 포션
+                        if (jyb.cnt[2] >= 1)
+                        {
+                            printf("맑은 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[2] -= 1;
+                            hpPlus(&clear, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 6: // 고농축 포션
+                        if (jyb.cnt[3] >= 1)
+                        {
+                            printf("고농축 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[3] -= 1;
+                            hpPlus(&strong, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 7: // 공격 히어로
+                        if (jyb.heroCnt[0] >= 1)
+                        {
+                            bAttack = true;
+                            printf("공격 히어로를 소환했습니다\n");
+                            printf("공격력이 두 배로 증가합니다.\n");
+                        }
+                        break;
+                    case 8: // 방어 히어로
+                        if (jyb.heroCnt[1] >= 1)
+                        {
+                            bDepense = true;
+                            printf("방어 히어로를 소환했습니다.\n");
+                            printf("데미지를 입지 않습니다.\n");
+                        }
+                        break;
+                    case 9: // 회피 히어로
+                        if (jyb.heroCnt[2] >= 1)
+                        {
+                            printf("회피 히어로를 소환했습니다.\n");
+                            printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                            printf("위치 이동 시키기\n");
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    printf("다시 입력하세요. \n");
+                }
+            }
+            if (mon.hp <= 0) // 플레이어가 이겼을 때
+            {
+                monsterClear(&mon, &jyb, sword, armor, shoes, gloves, cape, mask);
+            }
+            else if (jyb.hp <= 0) // 플레이어가 졌을 때
+            {
+                printf("체력 얼마 남기고 마을로 이동\n");
+            }
+            monsterExit(&mon);
+            bAttack = bDepense = bAvoid = false;
+            break;
+        case 72: // printf("구울 나와!!\n");
+            ghoul = createMonster("구울", 120, 280, 20, 45, 5, 100, 0.2, 0.0, 0.2, 0.0, 0.0, 0.0, 3);
+            //printMonsterInfo(ghoul);
+            mon = ghoul;
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", mon.name, mon.hp, mon.health);
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+            printf(">> 1 : 공격 / 2 : 도망가기\n");
+            printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+            printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+            while (mon.hp > 0 && jyb.hp > 0)
+            {
+                printf(">> 입력 : ");
+                scanf("%d", &input);
+                printf("\n");
+                if (input >= 0 && input < 10)
+                {
+                    switch (input)
+                    {
+                    case 1: // 공격
+                        if (bAttack)
+                        {
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            mon.hp -= damage;
+                            printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        }
+                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                        mon.hp -= damage;
+                        printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        if (mon.hp > 0)
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            // printf("*******damage min : %d max : %d, damage: %d\n", mon.maxDamage, mon.minDamage, damage);
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                        }
+                        if (jyb.hp <= 0)
+                        {
+                            printf("플레이어 사망\n");
+                        }
+                        break;
+                    case 2: // 도망 50%
+                        run = rand() % 2;
+                        if (run == 1)
+                        {
+                            printf("도망 성공, 위치 이동 시키기\n");
+                        }
+                        else
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }                            
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                            if (jyb.hp > 0)
+                            {
+                                if (bAttack)
+                                {
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    mon.hp -= damage;
+                                    printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                                }
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                mon.hp -= damage;
+                                printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                        } 
+                        break;
+                    case 3: // 빨간 포션
+                        if (jyb.cnt[0] >= 1)
+                        {
+                            printf("빨간 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[0] -= 1;
+                            hpPlus(&red, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 4: // 주황 포션
+                        if (jyb.cnt[1] >= 1)
+                        {
+                            printf("주황 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[1] -= 1;
+                            hpPlus(&orange, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 5: // 맑은 포션
+                        if (jyb.cnt[2] >= 1)
+                        {
+                            printf("맑은 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[2] -= 1;
+                            hpPlus(&clear, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 6: // 고농축 포션
+                        if (jyb.cnt[3] >= 1)
+                        {
+                            printf("고농축 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[3] -= 1;
+                            hpPlus(&strong, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 7: // 공격 히어로
+                        if (jyb.heroCnt[0] >= 1)
+                        {
+                            bAttack = true;
+                            printf("공격 히어로를 소환했습니다\n");
+                            printf("공격력이 두 배로 증가합니다.\n");
+                        }
+                        break;
+                    case 8: // 방어 히어로
+                        if (jyb.heroCnt[1] >= 1)
+                        {
+                            bDepense = true;
+                            printf("방어 히어로를 소환했습니다.\n");
+                            printf("데미지를 입지 않습니다.\n");
+                        }
+                        break;
+                    case 9: // 회피 히어로
+                        if (jyb.heroCnt[2] >= 1)
+                        {
+                            printf("회피 히어로를 소환했습니다.\n");
+                            printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                            printf("위치 이동 시키기\n");
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    printf("다시 입력하세요. \n");
+                }
+            }
+            if (mon.hp <= 0) // 플레이어가 이겼을 때
+            {
+                monsterClear(&mon, &jyb, sword, armor, shoes, gloves, cape, mask);
+            }
+            else if (jyb.hp <= 0) // 플레이어가 졌을 때
+            {
+                printf("체력 얼마 남기고 마을로 이동\n");
+            }
+            monsterExit(&mon);
+            bAttack = bDepense = bAvoid = false;
+            break;
+        case 73: // printf("해골 나와!!\n");
+            Skeleton = createMonster("해골", 120, 280, 20, 45, 5, 100, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 3);
+            //printMonsterInfo(Skeleton);
+            mon = Skeleton;
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", mon.name, mon.hp, mon.health);
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+            printf(">> 1 : 공격 / 2 : 도망가기\n");
+            printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+            printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+            while (mon.hp > 0 && jyb.hp > 0)
+            {
+                printf(">> 입력 : ");
+                scanf("%d", &input);
+                printf("\n");
+                if (input >= 0 && input < 10)
+                {
+                    switch (input)
+                    {
+                    case 1: // 공격
+                        if (bAttack)
+                        {
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            mon.hp -= damage;
+                            printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        }
+                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                        mon.hp -= damage;
+                        printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        if (mon.hp > 0)
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            // printf("*******damage min : %d max : %d, damage: %d\n", mon.maxDamage, mon.minDamage, damage);
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                        }
+                        if (jyb.hp <= 0)
+                        {
+                            printf("플레이어 사망\n");
+                        }
+                        break;
+                    case 2: // 도망 50%
+                        run = rand() % 2;
+                        if (run == 1)
+                        {
+                            printf("도망 성공, 위치 이동 시키기\n");
+                        }
+                        else
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                            if (jyb.hp > 0)
+                            {
+                                if (bAttack)
+                                {
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    mon.hp -= damage;
+                                    printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                                }
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                mon.hp -= damage;
+                                printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                        }
+                        break;
+                    case 3: // 빨간 포션
+                        if (jyb.cnt[0] >= 1)
+                        {
+                            printf("빨간 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[0] -= 1;
+                            hpPlus(&red, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 4: // 주황 포션
+                        if (jyb.cnt[1] >= 1)
+                        {
+                            printf("주황 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[1] -= 1;
+                            hpPlus(&orange, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 5: // 맑은 포션
+                        if (jyb.cnt[2] >= 1)
+                        {
+                            printf("맑은 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[2] -= 1;
+                            hpPlus(&clear, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 6: // 고농축 포션
+                        if (jyb.cnt[3] >= 1)
+                        {
+                            printf("고농축 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[3] -= 1;
+                            hpPlus(&strong, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 7: // 공격 히어로
+                        if (jyb.heroCnt[0] >= 1)
+                        {
+                            bAttack = true;
+                            printf("공격 히어로를 소환했습니다\n");
+                            printf("공격력이 두 배로 증가합니다.\n");
+                        }
+                        break;
+                    case 8: // 방어 히어로
+                        if (jyb.heroCnt[1] >= 1)
+                        {
+                            bDepense = true;
+                            printf("방어 히어로를 소환했습니다.\n");
+                            printf("데미지를 입지 않습니다.\n");
+                        }
+                        break;
+                    case 9: // 회피 히어로
+                        if (jyb.heroCnt[2] >= 1)
+                        {
+                            printf("회피 히어로를 소환했습니다.\n");
+                            printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                            printf("위치 이동 시키기\n");
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    printf("다시 입력하세요. \n");
+                }
+            }
+            if (mon.hp <= 0) // 플레이어가 이겼을 때
+            {
+                monsterClear(&mon, &jyb, sword, armor, shoes, gloves, cape, mask);
+            }
+            else if (jyb.hp <= 0) // 플레이어가 졌을 때
+            {
+                printf("체력 얼마 남기고 마을로 이동\n");
+            }
+            monsterExit(&mon);
+            bAttack = bDepense = bAvoid = false;
+            break;            
+        case 74: // printf("스파토이 나와!!\n");
+            Spatoy = createMonster("스파토이", 260, 360, 32, 75, 5, 200, 0.2, 0.0, 0.2, 0.0, 0.0, 0.0, 5);
+            //printMonsterInfo(Spatoy);
+            mon = Spatoy;
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", mon.name, mon.hp, mon.health);
+            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+            printf(">> 1 : 공격 / 2 : 도망가기\n");
+            printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+            printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+            while (mon.hp > 0 && jyb.hp > 0)
+            {
+                printf(">> 입력 : ");
+                scanf("%d", &input);
+                printf("\n");
+                if (input >= 0 && input < 10)
+                {
+                    switch (input)
+                    {
+                    case 1: // 공격
+                        if (bAttack)
+                        {
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            mon.hp -= damage;
+                            printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        }
+                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                        mon.hp -= damage;
+                        printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                        if (mon.hp > 0)
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            // printf("*******damage min : %d max : %d, damage: %d\n", mon.maxDamage, mon.minDamage, damage);
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                        }
+                        if (jyb.hp <= 0)
+                        {
+                            printf("플레이어 사망\n");
+                        }
+                        break;
+                    case 2: // 도망 50%
+                        run = rand() % 2;
+                        if (run == 1)
+                        {
+                            printf("도망 성공, 위치 이동 시키기\n");
+                        }
+                        else
+                        {
+                            damage = rand() % (mon.maxDamage - mon.minDamage + 1) + mon.minDamage;
+                            if (bDepense)
+                            {
+                                damage = 0;
+                            }
+                            if(damage-jyb.depense<=0)
+                            {
+                                damage = 1;
+                            }
+                            else{
+                                damage -= jyb.depense;
+                            }
+                            if(jyb.hp-damage < 0){
+                                jyb.hp = 0;
+                            }else{
+                                jyb.hp -= damage;
+                            }
+                            printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                            if (jyb.hp > 0)
+                            {
+                                if (bAttack)
+                                {
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    mon.hp -= damage;
+                                    printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                                }
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                mon.hp -= damage;
+                                printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                        }
+                        break;
+                    case 3: // 빨간 포션
+                        if (jyb.cnt[0] >= 1)
+                        {
+                            printf("빨간 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[0] -= 1;
+                            hpPlus(&red, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 4: // 주황 포션
+                        if (jyb.cnt[1] >= 1)
+                        {
+                            printf("주황 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[1] -= 1;
+                            hpPlus(&orange, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 5: // 맑은 포션
+                        if (jyb.cnt[2] >= 1)
+                        {
+                            printf("맑은 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[2] -= 1;
+                            hpPlus(&clear, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 6: // 고농축 포션
+                        if (jyb.cnt[3] >= 1)
+                        {
+                            printf("고농축 포션을 사용합니다.\n");
+                            printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                            jyb.cnt[3] -= 1;
+                            hpPlus(&strong, &jyb, 1);
+                        }
+                        printf("///체력 리셋///\n");
+                        break;
+                    case 7: // 공격 히어로
+                        if (jyb.heroCnt[0] >= 1)
+                        {
+                            bAttack = true;
+                            printf("공격 히어로를 소환했습니다\n");
+                            printf("공격력이 두 배로 증가합니다.\n");
+                        }
+                        break;
+                    case 8: // 방어 히어로
+                        if (jyb.heroCnt[1] >= 1)
+                        {
+                            bDepense = true;
+                            printf("방어 히어로를 소환했습니다.\n");
+                            printf("데미지를 입지 않습니다.\n");
+                        }
+                        break;
+                    case 9: // 회피 히어로
+                        if (jyb.heroCnt[2] >= 1)
+                        {
+                            printf("회피 히어로를 소환했습니다.\n");
+                            printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                            printf("위치 이동 시키기\n");
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    printf("다시 입력하세요. \n");
+                }
+            }
+            if (mon.hp <= 0) // 플레이어가 이겼을 때
+            {
+                monsterClear(&mon, &jyb, sword, armor, shoes, gloves, cape, mask);
+            }
+            else if (jyb.hp <= 0) // 플레이어가 졌을 때
+            {
+                printf("체력 얼마 남기고 마을로 이동\n");
+            }
+            monsterExit(&mon);
+            bAttack = bDepense = bAvoid = false;
+            break;
+
+        /* 보스 */
+        case 75: // printf("바포매트 나와!!\n");
+            BPMT = createBoss("바포매트", jyb.health * 5, 180, 450, 5, 700, 0.2, 0.3, 0.0, 0.2, 0.05, 0.0, 20);
+            //printBossInfo(BPMT);
+            boss = BPMT;
+            round2 = false;
+            while(1)
+            {
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", boss.name, boss.hp, boss.health);
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                printf(">> 1 : 공격 / 2 : 도망가기\n");
+                printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+                printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+                while (boss.hp > 0 && jyb.hp > 0)
+                {
+                    printf(">> 입력 : ");
+                    scanf("%d", &input);
+                    printf("\n");
+                    if (input >= 0 && input < 10)
+                    {
+                        switch (input)
+                        {
+                        case 1: // 공격
+                            if (bAttack)
+                            {
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                boss.hp -= damage;
+                                printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            boss.hp -= damage;
+                            printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                            if (boss.hp > 0)
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                            break;
+                        case 2: // 도망 50%
+                            run = rand() % 2;
+                            if (run == 1)
+                            {
+                                printf("도망 성공, 위치 이동 시키기\n");
+                            }
+                            else
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }                            
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                                if (jyb.hp > 0)
+                                {
+                                    if (bAttack)
+                                    {
+                                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                                        boss.hp -= damage;
+                                        printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                    }
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    boss.hp -= damage;
+                                    printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                }
+                                if (jyb.hp <= 0)
+                                {
+                                    printf("플레이어 사망\n");
+                                }
+                            }
+                            break;
+                        case 3: // 빨간 포션
+                            if (jyb.cnt[0] >= 1)
+                            {
+                                printf("빨간 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[0] -= 1;
+                                hpPlus(&red, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 4: // 주황 포션
+                            if (jyb.cnt[1] >= 1)
+                            {
+                                printf("주황 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[1] -= 1;
+                                hpPlus(&orange, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 5: // 맑은 포션
+                            if (jyb.cnt[2] >= 1)
+                            {
+                                printf("맑은 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[2] -= 1;
+                                hpPlus(&clear, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 6: // 고농축 포션
+                            if (jyb.cnt[3] >= 1)
+                            {
+                                printf("고농축 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[3] -= 1;
+                                hpPlus(&strong, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 7: // 공격 히어로
+                            if (jyb.heroCnt[0] >= 1)
+                            {
+                                bAttack = true;
+                                printf("공격 히어로를 소환했습니다\n");
+                                printf("공격력이 두 배로 증가합니다.\n");
+                            }
+                            break;
+                        case 8: // 방어 히어로
+                            if (jyb.heroCnt[1] >= 1)
+                            {
+                                bDepense = true;
+                                printf("방어 히어로를 소환했습니다.\n");
+                                printf("데미지를 입지 않습니다.\n");
+                            }
+                            break;
+                        case 9: // 회피 히어로
+                            if (jyb.heroCnt[2] >= 1)
+                            {
+                                printf("회피 히어로를 소환했습니다.\n");
+                                printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                                printf("위치 이동 시키기\n");
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        printf("다시 입력하세요. \n");
+                    }
+                }
+                if (boss.hp <= 0) // 플레이어가 이겼을 때
+                {
+                    bossClear(&boss, &jyb, sword, armor, shoes, gloves, cape, mask);
+                }
+                else if (jyb.hp <= 0) // 플레이어가 졌을 때
+                {
+                    printf("체력 얼마 남기고 마을로 이동\n");
+                }
+                bossExit(&boss);
+                bAttack = bDepense = bAvoid = false;    
+                if (rand()*100 +1 <= 0.05 * 100 && !round2)
+                {                           
+                    round2 = true;
+                    int myFriend = rand() % 13;
+                    Friends[myFriend].health = jyb.health*2;
+                    Friends[myFriend].hp = Friends[myFriend].health;
+                    boss = Friends[myFriend];
+                    printf("5%%확률로 %s가 등장했습니다.\n", Friends[myFriend].name);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            break;
+        case 76: // printf("이동녀크 나와!!\n");
+            LDNK = createBoss("이동녀크", jyb.health * 7, 300, 550, 5, 1000, 0.0, 0.3, 0.0, 0.2, 0.1, 0.1, 60);
+            //printBossInfo(LDNK);
+            boss = LDNK;
+            round2 = false;
+            while(1)
+            {
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", boss.name, boss.hp, boss.health);
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                printf(">> 1 : 공격 / 2 : 도망가기\n");
+                printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+                printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+                while (boss.hp > 0 && jyb.hp > 0)
+                {
+                    printf(">> 입력 : ");
+                    scanf("%d", &input);
+                    printf("\n");
+                    if (input >= 0 && input < 10)
+                    {
+                        switch (input)
+                        {
+                        case 1: // 공격
+                            if (bAttack)
+                            {
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                boss.hp -= damage;
+                                printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            boss.hp -= damage;
+                            printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                            if (boss.hp > 0)
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                            break;
+                        case 2: // 도망 50%
+                            run = rand() % 2;
+                            if (run == 1)
+                            {
+                                printf("도망 성공, 위치 이동 시키기\n");
+                            }
+                            else
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }                            
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                                if (jyb.hp > 0)
+                                {
+                                    if (bAttack)
+                                    {
+                                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                                        boss.hp -= damage;
+                                        printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                    }
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    boss.hp -= damage;
+                                    printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                }
+                                if (jyb.hp <= 0)
+                                {
+                                    printf("플레이어 사망\n");
+                                }
+                            }
+                            break;
+                        case 3: // 빨간 포션
+                            if (jyb.cnt[0] >= 1)
+                            {
+                                printf("빨간 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[0] -= 1;
+                                hpPlus(&red, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 4: // 주황 포션
+                            if (jyb.cnt[1] >= 1)
+                            {
+                                printf("주황 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[1] -= 1;
+                                hpPlus(&orange, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 5: // 맑은 포션
+                            if (jyb.cnt[2] >= 1)
+                            {
+                                printf("맑은 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[2] -= 1;
+                                hpPlus(&clear, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 6: // 고농축 포션
+                            if (jyb.cnt[3] >= 1)
+                            {
+                                printf("고농축 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[3] -= 1;
+                                hpPlus(&strong, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 7: // 공격 히어로
+                            if (jyb.heroCnt[0] >= 1)
+                            {
+                                bAttack = true;
+                                printf("공격 히어로를 소환했습니다\n");
+                                printf("공격력이 두 배로 증가합니다.\n");
+                            }
+                            break;
+                        case 8: // 방어 히어로
+                            if (jyb.heroCnt[1] >= 1)
+                            {
+                                bDepense = true;
+                                printf("방어 히어로를 소환했습니다.\n");
+                                printf("데미지를 입지 않습니다.\n");
+                            }
+                            break;
+                        case 9: // 회피 히어로
+                            if (jyb.heroCnt[2] >= 1)
+                            {
+                                printf("회피 히어로를 소환했습니다.\n");
+                                printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                                printf("위치 이동 시키기\n");
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        printf("다시 입력하세요. \n");
+                    }
+                }
+                if (boss.hp <= 0) // 플레이어가 이겼을 때
+                {
+                    bossClear(&boss, &jyb, sword, armor, shoes, gloves, cape, mask);
+                }
+                else if (jyb.hp <= 0) // 플레이어가 졌을 때
+                {
+                    printf("체력 얼마 남기고 마을로 이동\n");
+                }
+                bossExit(&boss);
+                bAttack = bDepense = bAvoid = false;    
+                if (rand()*100 +1 <= 0.05 * 100 && !round2)
+                {                           
+                    round2 = true;
+                    int myFriend = rand() % 13;
+                    Friends[myFriend].health = jyb.health*2;
+                    Friends[myFriend].hp = Friends[myFriend].health;
+                    boss = Friends[myFriend];
+                    printf("5%%확률로 %s가 등장했습니다.\n", Friends[myFriend].name);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            break;
+        case 77: // printf("최상달 나와!!\n");
+            CSD = createBoss("최상달", jyb.health * 10, 500, 1300, 5, 3000, 0.0, 0.3, 0.0, 0.3, 0.2, 0.2, 100);
+            //printBossInfo(CSD);
+            boss = CSD;
+            round2 = false;
+            while(1)
+            {
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", boss.name, boss.hp, boss.health);
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                printf(">> 1 : 공격 / 2 : 도망가기\n");
+                printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+                printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+                while (boss.hp > 0 && jyb.hp > 0)
+                {
+                    printf(">> 입력 : ");
+                    scanf("%d", &input);
+                    printf("\n");
+                    if (input >= 0 && input < 10)
+                    {
+                        switch (input)
+                        {
+                        case 1: // 공격
+                            if (bAttack)
+                            {
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                boss.hp -= damage;
+                                printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            boss.hp -= damage;
+                            printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                            if (boss.hp > 0)
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                            break;
+                        case 2: // 도망 50%
+                            run = rand() % 2;
+                            if (run == 1)
+                            {
+                                printf("도망 성공, 위치 이동 시키기\n");
+                            }
+                            else
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }                            
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                                if (jyb.hp > 0)
+                                {
+                                    if (bAttack)
+                                    {
+                                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                                        boss.hp -= damage;
+                                        printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                    }
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    boss.hp -= damage;
+                                    printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                }
+                                if (jyb.hp <= 0)
+                                {
+                                    printf("플레이어 사망\n");
+                                }
+                            }
+                            break;
+                        case 3: // 빨간 포션
+                            if (jyb.cnt[0] >= 1)
+                            {
+                                printf("빨간 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[0] -= 1;
+                                hpPlus(&red, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 4: // 주황 포션
+                            if (jyb.cnt[1] >= 1)
+                            {
+                                printf("주황 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[1] -= 1;
+                                hpPlus(&orange, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 5: // 맑은 포션
+                            if (jyb.cnt[2] >= 1)
+                            {
+                                printf("맑은 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[2] -= 1;
+                                hpPlus(&clear, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 6: // 고농축 포션
+                            if (jyb.cnt[3] >= 1)
+                            {
+                                printf("고농축 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[3] -= 1;
+                                hpPlus(&strong, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 7: // 공격 히어로
+                            if (jyb.heroCnt[0] >= 1)
+                            {
+                                bAttack = true;
+                                printf("공격 히어로를 소환했습니다\n");
+                                printf("공격력이 두 배로 증가합니다.\n");
+                            }
+                            break;
+                        case 8: // 방어 히어로
+                            if (jyb.heroCnt[1] >= 1)
+                            {
+                                bDepense = true;
+                                printf("방어 히어로를 소환했습니다.\n");
+                                printf("데미지를 입지 않습니다.\n");
+                            }
+                            break;
+                        case 9: // 회피 히어로
+                            if (jyb.heroCnt[2] >= 1)
+                            {
+                                printf("회피 히어로를 소환했습니다.\n");
+                                printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                                printf("위치 이동 시키기\n");
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        printf("다시 입력하세요. \n");
+                    }
+                }
+                if (boss.hp <= 0) // 플레이어가 이겼을 때
+                {
+                    bossClear(&boss, &jyb, sword, armor, shoes, gloves, cape, mask);
+                }
+                else if (jyb.hp <= 0) // 플레이어가 졌을 때
+                {
+                    printf("체력 얼마 남기고 마을로 이동\n");
+                }
+                bossExit(&boss);
+                bAttack = bDepense = bAvoid = false;    
+                if (rand()*100 +1 <= 0.05 * 100 && !round2)
+                {                           
+                    round2 = true;
+                    int myFriend = rand() % 13;
+                    Friends[myFriend].health = jyb.health*2;
+                    Friends[myFriend].hp = Friends[myFriend].health;
+                    boss = Friends[myFriend];
+                    printf("5%%확률로 %s가 등장했습니다.\n", Friends[myFriend].name);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            break;
+        case 78:
+            int myFriend = rand() % 13;
+            Friends[myFriend].health = jyb.health*2;
+            Friends[myFriend].hp = Friends[myFriend].health;
+            boss = Friends[myFriend];
+            printf("%s 나와!!\n", Friends[myFriend].name);
+            round2 = false;
+            while(1)
+            {
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", boss.name, boss.hp, boss.health);
+                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                printf(">> 1 : 공격 / 2 : 도망가기\n");
+                printf(">> 3: 빨간 포션 / 4. 주황 포션 / 5. 맑은 포션 / 6. 고농축 포션\n");
+                printf(">> 7. 공격 히어로 주문서(수량: %d) / 8. 방어 히어로 주문서(수량: %d) / 9. 회피 히어로 주문서(수량: %d)\n", jyb.heroCnt[0], jyb.heroCnt[1], jyb.heroCnt[2]);
+                while (boss.hp > 0 && jyb.hp > 0)
+                {
+                    printf(">> 입력 : ");
+                    scanf("%d", &input);
+                    printf("\n");
+                    if (input >= 0 && input < 10)
+                    {
+                        switch (input)
+                        {
+                        case 1: // 공격
+                            if (bAttack)
+                            {
+                                damage = jyb.power + (rand() % 10 + 1) + 10;
+                                boss.hp -= damage;
+                                printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, mon.hp);
+                            }
+                            damage = jyb.power + (rand() % 10 + 1) + 10;
+                            boss.hp -= damage;
+                            printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                            if (boss.hp > 0)
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+                            }
+                            if (jyb.hp <= 0)
+                            {
+                                printf("플레이어 사망\n");
+                            }
+                            break;
+                        case 2: // 도망 50%
+                            run = rand() % 2;
+                            if (run == 1)
+                            {
+                                printf("도망 성공, 위치 이동 시키기\n");
+                            }
+                            else
+                            {
+                                damage = rand() % (boss.maxDamage - boss.minDamage + 1) + boss.minDamage;
+                                if (bDepense)
+                                {
+                                    damage = 0;
+                                }                            
+                                if(damage-jyb.depense<=0)
+                                {
+                                    damage = 1;
+                                }
+                                else{
+                                    damage -= jyb.depense;
+                                }
+                                if(jyb.hp-damage < 0){
+                                    jyb.hp = 0;
+                                }else{
+                                    jyb.hp -= damage;
+                                }
+                                printf("몬스터에게 데미지 %d를 입었습니다. (남은 체력: %.2lf)\n", damage, jyb.hp);
+
+                                if (jyb.hp > 0)
+                                {
+                                    if (bAttack)
+                                    {
+                                        damage = jyb.power + (rand() % 10 + 1) + 10;
+                                        boss.hp -= damage;
+                                        printf("공격형 히어로가 몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                    }
+                                    damage = jyb.power + (rand() % 10 + 1) + 10;
+                                    boss.hp -= damage;
+                                    printf("몬스터에게 데미지 %d를 입혔습니다. (남은 체력: %.2lf)\n", damage, boss.hp);
+                                }
+                                if (jyb.hp <= 0)
+                                {
+                                    printf("플레이어 사망\n");
+                                }
+                            }
+                            break;
+                        case 3: // 빨간 포션
+                            if (jyb.cnt[0] >= 1)
+                            {
+                                printf("빨간 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[0] -= 1;
+                                hpPlus(&red, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 4: // 주황 포션
+                            if (jyb.cnt[1] >= 1)
+                            {
+                                printf("주황 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[1] -= 1;
+                                hpPlus(&orange, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 5: // 맑은 포션
+                            if (jyb.cnt[2] >= 1)
+                            {
+                                printf("맑은 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[2] -= 1;
+                                hpPlus(&clear, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 6: // 고농축 포션
+                            if (jyb.cnt[3] >= 1)
+                            {
+                                printf("고농축 포션을 사용합니다.\n");
+                                printf("[ %s ]\n체력 : %.2lf(/%.2lf)\n", jyb.name, jyb.hp, jyb.health);
+                                jyb.cnt[3] -= 1;
+                                hpPlus(&strong, &jyb, 1);
+                            }
+                            printf("///체력 리셋///\n");
+                            break;
+                        case 7: // 공격 히어로
+                            if (jyb.heroCnt[0] >= 1)
+                            {
+                                bAttack = true;
+                                printf("공격 히어로를 소환했습니다\n");
+                                printf("공격력이 두 배로 증가합니다.\n");
+                            }
+                            break;
+                        case 8: // 방어 히어로
+                            if (jyb.heroCnt[1] >= 1)
+                            {
+                                bDepense = true;
+                                printf("방어 히어로를 소환했습니다.\n");
+                                printf("데미지를 입지 않습니다.\n");
+                            }
+                            break;
+                        case 9: // 회피 히어로
+                            if (jyb.heroCnt[2] >= 1)
+                            {
+                                printf("회피 히어로를 소환했습니다.\n");
+                                printf("리바이 병장이 입체기동장치를 사용하여 나를 데리고 도망칩니다.\n");
+                                printf("위치 이동 시키기\n");
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        printf("다시 입력하세요. \n");
+                    }
+                }
+                if (boss.hp <= 0) // 플레이어가 이겼을 때
+                {
+                    bossClear(&boss, &jyb, sword, armor, shoes, gloves, cape, mask);
+                }
+                else if (jyb.hp <= 0) // 플레이어가 졌을 때
+                {
+                    printf("체력 얼마 남기고 마을로 이동\n");
+                }
+                bossExit(&boss);
+                bAttack = bDepense = bAvoid = false;    
+                if (rand()*100 +1 <= 0.05 * 100 && !round2)
+                {                           
+                    round2 = true;
+                    int myFriend = rand() % 13;
+                    Friends[myFriend].health = jyb.health*2;
+                    Friends[myFriend].hp = Friends[myFriend].health;
+                    boss = Friends[myFriend];
+                    printf("5%%확률로 %s가 등장했습니다.\n", Friends[myFriend].name);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            break;
+        default:
+            break;
+        }
+        while (getchar() != '\n')
+            ;
+        calcPlayer(&jyb, playerHP, equipEnchant);
+        printPlayerInfo(jyb, equipEnchant);
+    }
 
     // printf("////드워프의 제련소////\n");
     // while(1)
@@ -553,258 +2673,258 @@ int main()
     //     break;
     // }
 
-    printf("////판도라의 상점////\n");
-    while (1)
-    {
-        printf(" 1  %s (%d골드)\n", red.name, red.price);
-        printf(" 2  %s (%d골드)\n", orange.name, orange.price);
-        printf(" 3  %s (%d골드)\n", clear.name, clear.price);
-        printf(" 4  %s (%d골드)\n", strong.name, strong.price);
-        printf(" 5  %s (%d골드)\n", sword[2].name, tier2Price);
-        printf(" 6  %s (%d골드)\n", armor[2].name, tier2Price);
-        printf(" 7  %s (%d골드)\n", shoes[2].name, tier2Price);
-        printf(" 8  %s (%d골드)\n", gloves[2].name, tier2Price);
-        printf(" 9  %s (%d골드)\n", cape[2].name, tier2Price);
-        printf(" 10 %s (%d골드)\n", mask[2].name, tier2Price);
-        printf(" 11 마을 귀환 주문서 (%d골드)\n", scrollPrice);
-        printf("------------------------------\n");
-        int buyIdx, buyCnt;
-        int potionPrice[4] = {red.price, orange.price, clear.price, strong.price};
-        printf("구매할 아이템의 번호를 입력하세요 (종료하려면 q를 입력하세요.) : ");
-        scanf("%d", &buyIdx);
-        if (0 < buyIdx && buyIdx < 5)
-        {
-            while (1)
-            {
-                printf("<구매 전> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
-                printf("구매할 수량을 입력하세요 : ");
-                scanf("%d", &buyCnt);
-                if (buyCnt < 0)
-                {
-                    printf("\n다시 입력하세요.\n");
-                    continue;
-                }
-                else if (buyCnt * potionPrice[buyIdx - 1] > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    continue;
-                }
-                else if (buyCnt * potionPrice[buyIdx - 1] <= jyb.gold && buyCnt > 0)
-                {
-                    printf("구매가 완료되었습니다.\n");
-                    jyb.cnt[buyIdx] = jyb.cnt[buyIdx] + buyCnt;
-                    jyb.gold = jyb.gold - buyCnt * potionPrice[buyIdx - 1];
-                    printf("<구매 후> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
-                    break;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 5) // 무기 구매
-        {
-            if (jyb.swordIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.swordIdx += 1;
-                    equipEnchant[0] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 6) // 갑옷 구매
-        {
-            if (jyb.armorIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.armorIdx += 1;
-                    equipEnchant[1] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 7) // 신발 구매
-        {
-            if (jyb.shoesIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.shoesIdx += 1;
-                    equipEnchant[2] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 8) // 장갑 구매
-        {
-            if (jyb.glovesIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.swordIdx += 1;
-                    equipEnchant[0] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 9) // 망토 구매
-        {
-            if (jyb.capeIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.capeIdx += 1;
-                    equipEnchant[0] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 10) // 마스크 구매
-        {
-            if (jyb.swordIdx > 0)
-            {
-                printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
-                break;
-            }
-            else
-            {
-                if (tier2Price > jyb.gold)
-                {
-                    printf("골드가 부족합니다.\n");
-                    break;
-                }
-                else
-                {
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
-                    printf("구매가 완료되었습니다.\n");
-                    // 장비 교체 Player Idx 변경, equipEnchant 초기화
-                    jyb.swordIdx += 1;
-                    equipEnchant[0] = 1.0;
-                    jyb.gold = jyb.gold - tier2Price;
-                    printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
-                    calcPlayer(&jyb, playerHP, equipEnchant);
-                    printPlayerInfo(jyb, equipEnchant);
-                    break;
-                }
-            }
-        }
-        else if (buyIdx == 11) // 주문서
-        {
-            printf("구매 전 : 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
-            if (scrollPrice > jyb.gold)
-            {
-                printf("골드가 부족합니다.\n");
-                break;
-            }
-            else
-            {
-                jyb.cnt[4] += 1;
-                printf("구매가 완료되었습니다. 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
-            }
-        }
-        else
-        {
-            printf("\n다시 입력하세요.\n");
-            continue;
-        }
-        break;
-    }
+    // printf("////판도라의 상점////\n");
+    // while (1)
+    // {
+    //     printf(" 1  %s (%d골드)\n", red.name, red.price);
+    //     printf(" 2  %s (%d골드)\n", orange.name, orange.price);
+    //     printf(" 3  %s (%d골드)\n", clear.name, clear.price);
+    //     printf(" 4  %s (%d골드)\n", strong.name, strong.price);
+    //     printf(" 5  %s (%d골드)\n", sword[1].name, tier2Price);
+    //     printf(" 6  %s (%d골드)\n", armor[1].name, tier2Price);
+    //     printf(" 7  %s (%d골드)\n", shoes[1].name, tier2Price);
+    //     printf(" 8  %s (%d골드)\n", gloves[1].name, tier2Price);
+    //     printf(" 9  %s (%d골드)\n", cape[1].name, tier2Price);
+    //     printf(" 10 %s (%d골드)\n", mask[1].name, tier2Price);
+    //     printf(" 11 마을 귀환 주문서 (%d골드)\n", scrollPrice);
+    //     printf("------------------------------\n");
+    //     int buyIdx, buyCnt;
+    //     int potionPrice[4] = {red.price, orange.price, clear.price, strong.price};
+    //     printf("구매할 아이템의 번호를 입력하세요 (종료하려면 q를 입력하세요.) : ");
+    //     scanf("%d", &buyIdx);
+    //     if (0 < buyIdx && buyIdx < 5)
+    //     {
+    //         while (1)
+    //         {
+    //             printf("<구매 전> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
+    //             printf("구매할 수량을 입력하세요 : ");
+    //             scanf("%d", &buyCnt);
+    //             if (buyCnt < 0)
+    //             {
+    //                 printf("\n다시 입력하세요.\n");
+    //                 continue;
+    //             }
+    //             else if (buyCnt * potionPrice[buyIdx - 1] > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 continue;
+    //             }
+    //             else if (buyCnt * potionPrice[buyIdx - 1] <= jyb.gold && buyCnt > 0)
+    //             {
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 jyb.cnt[buyIdx] = jyb.cnt[buyIdx] + buyCnt;
+    //                 jyb.gold = jyb.gold - buyCnt * potionPrice[buyIdx - 1];
+    //                 printf("<구매 후> 수량: %d, 골드 : %d\n", jyb.cnt[buyIdx], jyb.gold);
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 5) // 무기 구매
+    //     {
+    //         if (jyb.swordIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.swordIdx += 1;
+    //                 equipEnchant[0] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 6) // 갑옷 구매
+    //     {
+    //         if (jyb.armorIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.armorIdx += 1;
+    //                 equipEnchant[1] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.armorIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 7) // 신발 구매
+    //     {
+    //         if (jyb.shoesIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.shoesIdx += 1;
+    //                 equipEnchant[2] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.shoesIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 8) // 장갑 구매
+    //     {
+    //         if (jyb.glovesIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.swordIdx += 1;
+    //                 equipEnchant[0] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.glovesIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 9) // 망토 구매
+    //     {
+    //         if (jyb.capeIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.capeIdx += 1;
+    //                 equipEnchant[0] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.capeIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 10) // 마스크 구매
+    //     {
+    //         if (jyb.swordIdx > 0)
+    //         {
+    //             printf("현재 착용하고 있는 장비 티어가 구매하려는 장비보다 같거나 높습니다.\n구매를 종료합니다.");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             if (tier2Price > jyb.gold)
+    //             {
+    //                 printf("골드가 부족합니다.\n");
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 printf("<구매 전> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+    //                 printf("구매가 완료되었습니다.\n");
+    //                 // 장비 교체 Player Idx 변경, equipEnchant 초기화
+    //                 jyb.swordIdx += 1;
+    //                 equipEnchant[0] = 1.0;
+    //                 jyb.gold = jyb.gold - tier2Price;
+    //                 printf("<구매 후> 티어: %d, 골드 : %d\n", jyb.swordIdx, jyb.gold);
+    //                 calcPlayer(&jyb, playerHP, equipEnchant);
+    //                 printPlayerInfo(jyb, equipEnchant);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     else if (buyIdx == 11) // 주문서
+    //     {
+    //         printf("구매 전 : 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
+    //         if (scrollPrice > jyb.gold)
+    //         {
+    //             printf("골드가 부족합니다.\n");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             jyb.cnt[4] += 1;
+    //             printf("구매가 완료되었습니다. 마을 귀환 주문서를 %d개 가지고 있습니다.\n", jyb.cnt[4]);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         printf("\n다시 입력하세요.\n");
+    //         continue;
+    //     }
+    //     break;
+    // }
 
     // 펫상점
     // while (1)
@@ -846,7 +2966,6 @@ int main()
     //     printf("현재 레벨: %d\n", jyb.level);
     //     break;
     // }
-
 
     return 0;
 }
