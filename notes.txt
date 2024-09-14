@@ -1,0 +1,5 @@
+aa bb "Hello, how are you?" 0 1 "2024-09-13 10:15:00"
+bb cc "Meeting at 2 PM" 1 1 "2024-09-13 11:00:00"
+cc dd "Please review the document" 0 0 "2024-09-13 12:30:00"
+dd ff "I am doing well, thank you!" 1 1 "2024-09-13 13:45:00"
+ff aa "Lunch at noon?" 0 1 "2024-09-13 09:00:00"
