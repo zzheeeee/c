@@ -1,0 +1,222 @@
+import random
+import os
+import pickle as pk
+
+
+CURRENT_LEVEL = 0
+WIN_LOSE = [0, 0]
+BASE = [str(i) for i in range(10)]
+
+
+def setting() -> None:
+    if not os.path.exists("./game_data"):
+        os.mkdir("./game_data")
+    load_data()
+
+
+def load_data() -> None:
+    global WIN_LOSE
+    tmp = False
+    if os.path.exists("./game_data/game.dat"):
+        with open("./game_data/game.dat", "rb") as fr:
+            try:
+                data = pk.load(fr)
+            except Exception as e:
+                save_data()
+                input("저장 파일이 손상되어 다시 생성합니다.")
+                tmp = True
+                data = WIN_LOSE
+            if not isinstance(data, list):
+                save_data()
+                input("저장 파일이 손상되어 다시 생성합니다.")
+                tmp = True
+        if tmp:
+            with open("./game_data/game.dat", "wb") as fw:
+                pk.dump([0, 0], fw)
+        else:
+            WIN_LOSE = data
+
+
+def save_data(msg:bool=False) -> None:
+    with open("./game_data/game.dat", "wb") as fw:
+        pk.dump(WIN_LOSE, fw)
+    if msg:
+        input("저장이 완료되었습니다!")
+
+
+def score() -> None:
+    os.system("cls")
+    print(f"승리 : {WIN_LOSE[0]}")
+    print(f"패배 : {WIN_LOSE[1]}")
+    if sum(WIN_LOSE) != 0:
+        print(f"승률 : {WIN_LOSE[0]} / {sum(WIN_LOSE)} ({round(WIN_LOSE[0] / sum(WIN_LOSE) * 100, 2)}%)")
+    else:
+        print("승률 : None")
+    input("돌아가기(Enter)")
+    os.system("cls")
+
+
+def game(count:int) -> None:
+    os.system("cls")
+    answer = random.sample(BASE, 3)
+    while_count = count
+    while while_count > 0:
+        inputs = input(f"3자리수를 입력해주세요(남은 횟수:{while_count}, 중도포기:exit)>> ")
+        if check_input(inputs, 999):
+            back = check_sb(answer, inputs)
+        else:
+            os.system("cls")
+            input("잘못 입력하였습니다. 다시 입력해주세요.(Enter)")
+            os.system("cls")
+            continue
+        if back == "exit":
+            WIN_LOSE[1] += 1
+            input(f"포기하셨습니다... 정답은 {answer}이였습니다...")
+            return
+        if game_result(back):
+            WIN_LOSE[0] += 1
+            input(f"승리하셨습니다! 정답은 {answer}이였습니다!")
+            return
+        else:
+            while_count -= 1
+    WIN_LOSE[1] += 1
+    input(f"패배하셨습니다... 정답은 {answer}이였습니다...")
+
+
+def game_result(ret:list) -> bool:
+    os.system("cls")
+    if ret[0] == 3:
+        input("3Strike!")
+        os.system("cls")
+        return True
+    if (ret[0] == 0) and (ret[1] == 0):
+        input("Out!")
+        os.system("cls")
+        return False
+    if ret[0] > 0:
+        input(f"{ret[0]} Strike! ")
+    if ret[1] > 0:
+        input(f"{ret[1]} Ball!")
+    os.system("cls")
+    return False
+
+
+def main() -> str:
+    os.system("cls")
+    while True:
+        print("[숫자야구!]")
+        print("1. 게임시작")
+        print("2. 전적확인")
+        print("0. 게임종료")
+        inputs = input("입력>> ")
+        if check_input(inputs, 2):
+            return inputs
+        else:
+            os.system("cls")
+            input("잘못된 입력입니다. 다시 입력해주세요.")
+            os.system("cls")
+
+
+def select_level() -> str:
+    os.system("cls")
+    while True:
+        print("[난이도 선택]")
+        print("1. Easy")
+        print("2. Normal")
+        print("3. Hard")
+        print("0. 돌아가기")
+        inputs = input("입력>> ")
+        if check_input(inputs, 3):
+            return inputs
+        else:
+            os.system("cls")
+            input("잘못된 입력입니다. 다시 입력해주세요.")
+            os.system("cls")
+
+
+def change_level(level:str) -> None:
+    global CURRENT_LEVEL
+    if "1" in level:
+        CURRENT_LEVEL = 1
+    elif "2" in level:
+        CURRENT_LEVEL = 2
+    elif "3" in level:
+        CURRENT_LEVEL = 3
+
+
+def set_level() -> int:
+    if CURRENT_LEVEL == 1:
+        return 20
+    elif CURRENT_LEVEL == 2:
+        return 15
+    elif CURRENT_LEVEL == 3:
+        return 10
+
+
+def restart() -> str:
+    os.system("cls")
+    while True:
+        print("[다시 시작하겠습니까?]")
+        print("1. 다시시작")
+        print("0. 돌아가기")
+        inputs = input("입력>> ")
+        if check_input(inputs, 1):
+            return inputs
+        else:
+            os.system("cls")
+            input("잘못된 입력입니다. 다시 입력해주세요.")
+            os.system("cls")
+
+
+def check_sb(answer:list, inputs:str) -> list:
+    ret = [0, 0]
+    for ac, ic in zip(answer, inputs):
+        if ic in answer:
+            if ac == ic:
+                ret[0] += 1
+            else:
+                ret[1] += 1
+    return ret
+
+
+def check_input(inputs:str, range_:int) -> bool:
+    for i in range(range_+1):
+        if str(i) in inputs:
+            return True
+    if range_ == 999:
+        if inputs == "exit":
+            return True
+        if len(inputs) != 3:
+            return False
+        for char in inputs:
+            if inputs.count(char) > 1:
+                return False
+    return False
+
+
+def run():
+    setting()
+    while True:
+        ret = main()
+        if "1" in ret:
+            ret = select_level()
+            if "0" in ret:
+                continue
+            change_level(ret)
+            while True:
+                game(set_level())
+                ret = restart()
+                if ret == "1":
+                    continue
+                else:
+                    break
+        elif "2" in  ret:
+            score()
+        elif "0" in ret:
+            input("프로그램을 종료합니다.")
+            exit()
+        save_data()
+
+
+if __name__ == "__main__":
+    run()
