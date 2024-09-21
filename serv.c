@@ -16,10 +16,11 @@
 
 #define RED "\033[31m"
 #define RED_BOLD "\033[1;31m"
-#define BLUE "\033[34m" -
-#define PURPLE "\033[47m"
-#define PINK_BOLD "\033[1;35m"
-#define GREEN "\033[38;2;35;101;51m"
+#define BLUE "\033[1;34m"
+#define PINK "\033[1;38;2;255;105;180m" // 핑크색
+#define ORANGE "\033[1;38;2;255;165;0m" // 주황색
+#define PURPLE "\033[1;35m"
+#define GREEN "\033[1;38;2;35;101;51m"
 #define BOLD "\033[1;0m"
 #define END "\033[0m"
 
@@ -64,7 +65,7 @@ int all_users_len;                  // 저장된 사용자 수
 Note note_list[NOTE_SIZE];          // 쪽지 리스트(전체)
 Note user_note_list[NOTE_SIZE];     // 쪽지 리스트(사용자)
 int note_count = 0;                 // 현재 저장된 쪽지의 수
-int currentroom = 0;                // 현재 사용중인 채팅방 수
+// int currentroom = 0;                // 현재 사용중인 채팅방 수
 
 /* 함수 프로토타입 선언 */
 void *server_input(void *arg);                                  // 메시지 > 서버 공지
@@ -84,6 +85,21 @@ void process_update(const char *read, const char *delete);
 void add_note_to_file(Note *note);
 int unoccupiedNum();
 
+// int get_client_index(int clnt_sock)
+// {
+//     pthread_mutex_lock(&mutx);
+//     for (int i = 0; i < clnt_cnt; i++)
+//     {
+//         if (clients[i].sock == clnt_sock)
+//         {
+//             pthread_mutex_unlock(&mutx);
+//             return i;
+//         }
+//     }
+//     pthread_mutex_unlock(&mutx);
+//     return -1; // 클라이언트 인덱스가 발견되지 않음
+// }
+
 int main(int argc, char *argv[])
 {
     int serv_sock, clnt_sock;
@@ -99,6 +115,26 @@ int main(int argc, char *argv[])
         printf("Usage : %s <port>\n", argv[0]);
         exit(1);
     }
+
+    /* 전체 사용자 길이, 쪽지 내용 가져오기 */
+    all_users_len = users_read();
+    initialize_note_list(note_list, NOTE_SIZE);
+    load_notes();
+
+    strcpy(chatrms[0].roomname, "전체 채팅방"); // 방 0번에 전체 채팅방 이름 설정
+    for (int i = 1; i <= 10; i++)               // 방 1번부터 10번까지
+    {
+        char numstr[3];                            // 숫자를 문자열로 변환할 배열 (최대 2자리 숫자 + 널 문자)
+        snprintf(numstr, sizeof(numstr), "%d", i); // 숫자를 문자열로 변환
+
+        strcpy(chatrms[i].roomname, "방");   // "방"을 먼저 복사
+        strcat(chatrms[i].roomname, numstr); // numstr을 붙임
+
+        chatrms[i].roomnumber = i;
+        chatrms[i].usercount = 0;
+    }
+
+    printf("사용자 길이: %d, note_count : %d\n", all_users_len, note_count);
 
     pthread_mutex_init(&mutx, NULL);
 
@@ -143,39 +179,6 @@ int main(int argc, char *argv[])
         clients[idx].username[0] = '\0'; // 사용자 이름 초기화
         clients[idx].loggedIn = 0;       // 로그인 상태 초기화
         clients[idx].roomnumber = 0;     // 채팅방 번호 초기화
-
-        /* 전체 사용자 길이, 쪽지 내용 가져오기 */
-        all_users_len = users_read();
-        initialize_note_list(note_list, NOTE_SIZE);
-        load_notes();
-        // 테스트 프린트
-        // for (int i = 0; i < note_count; i++)
-        // {
-        //     printf("Index: %d\n", note_list[i].index);
-        //     printf("Sender: %s\n", note_list[i].sender);
-        //     printf("Receiver: %s\n", note_list[i].receiver);
-        //     printf("Content: %s\n", note_list[i].content);
-        //     printf("ReadYN: %d\n", note_list[i].readYN);
-        //     printf("DeleteYN: %d\n", note_list[i].deleteYN);
-        //     printf("SendTime: %s\n", note_list[i].sendTime);
-        //     printf("----------------------------\n");
-        // }
-        printf("사용자 길이: %d, note_count : %d\n", all_users_len, note_count);
-
-        strcpy(chatrms[0].roomname, "전체 채팅방");
-        char numstr[10] = {0};
-        for (int i = 0; i < 11; i++)
-        {
-            sprintf(numstr, "%d", i); // 숫자를 문자열로 변환
-
-            // "방" + numstr 결합
-            strcpy(chatrms[i].roomname, "방");   // "방"을 먼저 복사
-            strcat(chatrms[i].roomname, numstr); // numstr을 붙임
-
-            chatrms[i].roomnumber = i;
-            chatrms[i].usercount = 0;
-        }
-
         pthread_mutex_unlock(&mutx);
 
         /* 새로운 쓰레드 생성하여 handle_clnt 함수 실행 */
@@ -282,7 +285,8 @@ void *handle_clnt(void *arg)
                 {
                     pthread_mutex_lock(&mutx);
                     strcpy(clients[idx].username, username);
-                    clients[idx].loggedIn = 1; // 로그인 상태 설정
+                    clients[idx].loggedIn = 1;   // 로그인 상태 설정
+                    clients[idx].roomnumber = 0; // 로그인 상태 설정
                     pthread_mutex_unlock(&mutx);
 
                     const char *login_success_msg = "로그인 성공\n";
@@ -295,7 +299,7 @@ void *handle_clnt(void *arg)
 
                     /* 로그인 알림 전송 */
                     char login_msg[BUF_SIZE + 50];
-                    snprintf(login_msg, sizeof(login_msg), "%s%s님이 로그인 했습니다. %s\n", PINK_BOLD, clients[idx].username, END);
+                    snprintf(login_msg, sizeof(login_msg), "%s%s님이 로그인 했습니다. %s\n", ORANGE, clients[idx].username, END);
                     send_msg(login_msg, strlen(login_msg), clients[idx].username);
                     is_authenticated = 1;
                 }
@@ -353,135 +357,213 @@ void *handle_clnt(void *arg)
         }
         else if (strcmp(msg, "/makeroom") == 0)
         {
-            char make_msg[BUF_SIZE]; // 메시지 생성
-            currentroom++;           // 방 번호를 1 증가시킴 (1부터 10까지 사용)
-
-            // 현재 방 번호를 문자열로 변환
-            char numstr[3];
             int rmnumber = unoccupiedNum();
-            if(0 < rmnumber)
-                snprintf(numstr, sizeof(numstr), "%d", rmnumber);
 
-            // 메시지 생성
-            char mkrmsg[20];
-            snprintf(mkrmsg, sizeof(mkrmsg), "/makeroom %s", numstr);
-
+            // 방 번호가 유효한지 체크
             if (rmnumber >= 1 && rmnumber <= 10)
             {
                 chatrms[rmnumber].usercount++; // 방 사용자 수 업데이트
-
-                // 사용자 이름 저장 및 방 번호 할당
                 strcpy(chatrms[rmnumber].username, username);
+
+                // 방 번호를 포함한 메시지 전송
+                char makeroom_msg[BUF_SIZE];
+                snprintf(makeroom_msg, sizeof(makeroom_msg), "/makeroom %d\n", rmnumber);
+
+                // 사용자 정보 업데이트 및 메시지 전송
                 for (int i = 0; i < clnt_cnt; i++)
                 {
-                    if (strcmp(clients[i].username, username) == 0) // 문자열 비교
+                    if (strcmp(clients[i].username, username) == 0)
                     {
                         clients[i].roomnumber = rmnumber;
-                        send(clnt_sock, mkrmsg, strlen(mkrmsg), 0); // 메시지 전송
+                        send(clnt_sock, makeroom_msg, strlen(makeroom_msg), 0);
+                        printf("전달된 메시지: %s\n", makeroom_msg);
                         printf("방 %d이 생성되었습니다.\n", rmnumber);
-
-                        snprintf(make_msg, sizeof(make_msg), "%s%s님이 방을 나갔습니다. %s\n", PINK_BOLD, username, END);
-                        send(clients[i].sock, make_msg, strlen(make_msg), 0); // 채팅방에 남아있는 사람에게 방 나감 메시지 전송
-                        break;
                     }
                 }
             }
+            else
+            {
+                // 방이 없을 경우의 처리
+                const char *error_msg = "모든 방이 차 있습니다.";
+                send(clnt_sock, error_msg, strlen(error_msg), 0);
+            }
         }
+
         else if (strcmp(msg, "/leaveroom") == 0)
         {
-            char leave_msg[BUF_SIZE]; // 메시지 생성
-            char mkrmsg[20];
-            char numstr[3];
-            int num = 0;
+            char leave_msg[BUF_SIZE * 2];
+            int num = -1; // 초기값 설정
 
             for (int i = 0; i < clnt_cnt; i++)
             {
-                if (strcmp(clients[i].username, username) == 0) // 문자열 비교
+                if (strcmp(clients[i].username, username) == 0)
                 {
-                    num = clients[i].roomnumber;
-                    chatrms[num].usercount--;  // 채팅방 구조체 > 인원 1 감소
-                    clients[i].roomnumber = 0; // 사용자 구조체 > 방번호 0
-                    snprintf(numstr, sizeof(numstr), "%d", clients[i].roomnumber);
-                    snprintf(mkrmsg, sizeof(mkrmsg), "/leaveroom %s", numstr);
-                    send(clnt_sock, mkrmsg, strlen(mkrmsg), 0); // 메시지 전송
-                    break;
-                }
-            }
-
-            if (chatrms[num].usercount > 0)
-            {
-                for (int i = 0; i < clnt_cnt; i++)
-                {
-                    if (clients[i].roomnumber == num)
+                    num = clients[i].roomnumber; // 방 번호 가져오기
+                    if (num > 0)
                     {
-                        strcpy(chatrms[num].username, clients[i].username); // 남은 사람한테 방장 넘기기 ㅋㅋ
-                        snprintf(leave_msg, sizeof(leave_msg), "%s%s님이 방을 나갔습니다. %s\n", PINK_BOLD, username, END);
-                        send(clients[i].sock, leave_msg, strlen(leave_msg), 0); // 채팅방에 남아있는 사람에게 방 나감 메시지 전송
+                        // usercount가 0 이하로 내려가지 않도록 체크
+                        if (chatrms[num].usercount > 0)
+                        {
+                            chatrms[num].usercount--; // 채팅방 구조체에서 인원 1 감소
+                        }
+                        else
+                        {
+                            chatrms[num].usercount = 0; // 안전하게 0으로 설정
+                        }
+
+                        clients[i].roomnumber = 0; // 사용자 구조체에서 방 번호 0으로 설정
+
+                        // 방 나갔음을 다른 사용자에게 알림
+                        snprintf(leave_msg, sizeof(leave_msg), "\n%s%s님이 방을 나갔습니다.%s\n", PINK, username, END);
+                        for (int j = 0; j < clnt_cnt; j++)
+                        {
+                            if (clients[j].roomnumber == num)
+                            {
+                                // 다른 클라이언트에게 방 나감 메시지 전송
+                                send(clients[j].sock, leave_msg, strlen(leave_msg), 0);
+                            }
+                        }
+
+                        // 클라이언트에게 방 번호가 0으로 설정되었음을 알리는 메시지 전송
+                        send(clients[i].sock, "/leave 0", strlen("/leave 0"), 0);
+                        printf("\n%s%s님이 방 %d에서 나갔습니다.\n", PINK, username, num);
                     }
+                    break; // 사용자 정보를 찾았으니 루프 탈출
                 }
             }
-            currentroom--;
         }
-        else if (strncmp(msg, "/inviteroom", 11) == 0)
+        else if (strncmp(msg, "/invite", 7) == 0)
         {
-            char invite_msg[BUF_SIZE];
-            // 메시지 생성!!
+            char buf[BUF_SIZE * 2] = "";
+            char invite_msg[BUF_SIZE] = "/invite ";
             char mkrmsg[20];
             char numstr[3];
-            int rmnum = -1, innum = -1;
-            
+            int invitor = -1, innum = -1;
+
+            // 메시지에서 초대하는 사용자 찾기
             for (int i = 0; i < clnt_cnt; i++)
             {
-                if (clients[i].username == username)
+                if (strcmp(clients[i].username, username) == 0) // 문자열 비교 수정
                 {
-                    rmnum = i;
-                    strcpy(numstr, atoi(clients[rmnum].roomnumber));
-                    printf("초대할 방 번호: %s\n", numstr);
+                    invitor = i;
+                    break; // 사용자 찾으면 루프 종료
                 }
             }
-
-            // "/inviteroom" 이후의 문자열을 분리
-            char *usr = strtok(msg + 12, " "); // "/inviteroom " 다음부터 분리
-            if(rmnum != -1)
-            {                    
+            // "/invite" 이후의 문자열을 분리
+            char *usr = strtok(msg + 7, " "); // "/invite " 다음부터 분리
+            /* 개행 문자가 포함되어 있을 경우 제거 */
+            if (usr != NULL)
+            {
+                char *newline = strchr(usr, '\n'); // 개행 문자 찾기
+                if (newline != NULL)
+                {
+                    *newline = '\0'; // 개행 문자를 널 문자로 변경하여 제거
+                }
+            }
+            // printf("%s######",usr);
+            if (invitor != -1)
+            {
                 for (int i = 0; i < clnt_cnt; i++)
                 {
-                    if (clients[i].username == usr)
+                    if (strcmp(clients[i].username, usr) == 0 && clients[i].loggedIn == 1) // 문자열 비교 수정
                     {
                         printf("초대할 사용자: %s\n", usr);
                         innum = i;
-                        chatrms[clients[rmnum].roomnumber].usercount++;
+                        break; // 초대할 사용자 찾으면 루프 종료
+                    }
+                    else
+                    {
+                        printf("%s vs %s\n", usr, clients[i].username);
                     }
                 }
             }
-
-            if (innum != -1 && rmnum != -1) // username이 잘 분리된 경우
+            if (innum != -1 && invitor != -1) // username이 잘 분리된 경우
             {
-                // // 추가 작업 수행 (예: 초대 메시지 생성 등) // 이후 처리
-                // snprintf(mkrmsg, sizeof(mkrmsg), "초대 메시지: %s", usr);
-                clients[innum].roomnumber = clients[rmnum].roomnumber;
+                // 초대받은 사용자의 방 번호 설정 및 usercount 증가
+                clients[innum].roomnumber = clients[invitor].roomnumber; // 방 번호 설정
+                chatrms[clients[invitor].roomnumber].usercount++;        // 사용자 수 증가
 
-                snprintf(invite_msg, sizeof(invite_msg), "%s%s님이 초대되었습니다. %s\n", PINK_BOLD, clients[innum].username, END);
-                send(clients[innum].sock, invite_msg, strlen(invite_msg), 0); // 초대당한사람한테 초대된거 알려주기
-                send(clients[rmnum].sock, invite_msg, strlen(invite_msg), 0); // 초대한사람한테도 보내기
+                snprintf(invite_msg, sizeof(invite_msg), "%d", clients[innum].roomnumber);
+                write(clnt_sock, invite_msg, sizeof(invite_msg));
+
+                // 초대된 사용자에게 알림
+                snprintf(buf, sizeof(buf), "\n%s%s님이 초대되었습니다. %s\n", PINK, clients[innum].username, END);
+                send(clients[innum].sock, buf, strlen(buf), 0);
+
+                // 초대한 사용자에게도 알림
+                snprintf(buf, sizeof(buf), "\n%s%s님이 초대되었습니다. %s\n", PINK, clients[innum].username, END);
+                send(clients[invitor].sock, buf, strlen(buf), 0);
             }
             else if (innum == -1)
             {
-                printf("사용자 이름을 찾을 수 없습니다.\n");
-                break;
+                snprintf(buf, sizeof(buf), "사용자없음\n");
+                send(clients[invitor].sock, buf, strlen(buf), 0); // 초대한 사람에게 알림
+                printf("%s 사용자를 찾을 수 없습니다.\n", usr);
+            }
+        }
+        else if (strncmp(msg, "/inroom", 7) == 0)
+        {
+            char inroom_msg[BUF_SIZE * 2];
+            char inrm_msg[BUF_SIZE * 2];
+
+            char *room = strtok((char *)msg, " "); // "/inroom" 이후로 분리
+            room = strtok(NULL, " ");              // 방 번호 추출
+
+            if (room != NULL)
+            {
+                int rm = atoi(room);
+                if (rm >= 0 && rm < 10 && chatrms[rm].usercount != 0)
+                {
+                    for (int i = 0; i < clnt_cnt; i++)
+                    {
+                        if (strcmp(username, clients[i].username) == 0)
+                        {
+                            clients[i].roomnumber = rm;
+                            snprintf(inroom_msg, sizeof(inroom_msg), "\n%s%s님이 방 %d에 입장했습니다.%s\n", PINK, username, rm, END);
+                            send(clients[i].sock, inroom_msg, strlen(inroom_msg), 0);
+                        }
+                    }
+                    for (int i = 0; i < clnt_cnt; i++)
+                    {
+                        if (clients[i].roomnumber == rm && strcmp(username, clients[i].username) != 0)
+                        {
+                            snprintf(inrm_msg, sizeof(inrm_msg), "\n%s%s님이 입장했습니다.%s\n", PINK, username, END);
+                            send(clients[i].sock, inrm_msg, strlen(inrm_msg), 0);
+                        }
+                    }
+                }
+                else
+                {
+                    snprintf(inrm_msg, sizeof(inrm_msg), "방 번호가 유효하지 않습니다.\n");
+                    send(clnt_sock, inrm_msg, strlen(inrm_msg), 0);
+                }
             }
         }
         else if (strcmp(msg, "/room") == 0)
         {
-            for(int i = 1; i < 11; i++)
+            char buffer[20];                   // 임시 버퍼
+            char roomList[100] = "/roomList "; // 모든 방 정보를 저장할 문자열, /room으로 초기화
+
+            for (int i = 1; i < 11; i++)
             {
-                if(chatrms[i].usercount != 0)
+                snprintf(buffer, sizeof(buffer), "%d,%d", i, chatrms[i].usercount); // 문자열 형식 지정
+                strcat(roomList, buffer);                                           // roomList에 추가
+
+                /* 각 방 정보 사이에 공백 추가 */
+                if (i < 10) // 마지막 방에는 공백을 추가하지 않음
                 {
-                    printf("=========================================\n");
-                    printf("[방%d]\n",i);
-                    printf("참여 인원: %d명", chatrms[i].usercount);
-                    printf("=========================================\n");                   
+                    strcat(roomList, " ");
                 }
+            }
+
+            // 클라이언트에게 write로 전송
+            if (write(clnt_sock, roomList, strlen(roomList)) < 0)
+            {
+                perror("write() error");
+            }
+            else
+            {
+                printf("방 정보가 클라이언트에게 전송되었습니다: %s\n", roomList);
             }
         }
         else if (strncmp(msg, "/exit", 5) == 0)
@@ -491,7 +573,7 @@ void *handle_clnt(void *arg)
 
             // 로그아웃 메시지 생성
             char exit_msg[BUF_SIZE + 50];
-            snprintf(exit_msg, sizeof(exit_msg), "%s%s님이 로그아웃 했습니다. %s\n", PINK_BOLD, username, END);
+            snprintf(exit_msg, sizeof(exit_msg), "\n%s%s님이 로그아웃 했습니다. %s\n", ORANGE, username, END);
             printf("로그아웃 메시지 생성: %s\n", exit_msg); // 로그아웃 메시지 확인
 
             // 다른 클라이언트들에게 로그아웃 메시지 전송
@@ -511,55 +593,52 @@ void *handle_clnt(void *arg)
         }
         else if (strncmp(msg, "/note_send", 10) == 0) // 메시지가 /note_send로 시작하는지 확인
         {
-            char buffer[1024];      // 수신 버퍼
-            ssize_t bytes_received; // 수신 바이트 수
+            // 쪽지 정보를 저장할 변수
+            int index, readYN, deleteYN;
+            char sender[50], receiver[50], content[512], sendTime[100];
 
-            /* msg의 복사본을 생성 */
-            char *message_copy = strdup(msg);
-            if (message_copy == NULL)
+            // sscanf로 /note_send 이후의 데이터를 파싱
+            int matched = sscanf(msg, "/note_send %d %s %s %s %d %d %[^\n]",
+                                 &index, sender, receiver, content, &readYN, &deleteYN, sendTime);
+
+            // 파싱된 데이터가 모두 매칭되지 않으면 에러 처리
+            if (matched != 7)
             {
-                perror("strdup() error"); // strdup 실패 시 에러 메시지 출력
-                continue;                 // 다음 루프로 이동
+                fprintf(stderr, "Error: insufficient or incorrect data format\n");
+                continue;
             }
 
-            char *tokens[7];                         // 토큰을 저장할 배열
-            int token_count = 0;                     // 토큰 수 카운트
-            char *token = strtok(message_copy, " "); // 첫 번째 토큰 추출
-
-            /*/ /note_send 명령어 이후 데이터 추출 */
-            if (strncmp(token, "/note_send", 10) != 0)
-            {
-                fprintf(stderr, "Invalid command\n"); // 유효하지 않은 명령어 시 에러 메시지 출력
-                free(message_copy);                   // 메모리 해제
-                continue;                             // 다음 루프로 이동
-            }
-
-            // 나머지 토큰 추출
-            while ((token = strtok(NULL, " ")) != NULL && token_count < 7)
-            {
-                tokens[token_count++] = token; // 토큰 저장
-            }
-
-            // 데이터가 충분하지 않으면 오류 메시지 출력
-            if (token_count != 7)
-            {
-                fprintf(stderr, "Error: insufficient data\n"); // 데이터 부족 시 에러 메시지 출력
-                free(message_copy);                            // 메모리 해제
-                continue;                                      // 다음 루프로 이동
-            }
-
-            Note newNote;                        // 새로운 쪽지 구조체 선언
-            newNote.index = atoi(tokens[0]);     // 인덱스 설정
-            strcpy(newNote.sender, tokens[1]);   // 발신자 설정
-            strcpy(newNote.receiver, tokens[2]); // 수신자 설정
-            strcpy(newNote.content, tokens[3]);  // 내용 설정
-            newNote.readYN = atoi(tokens[4]);    // 읽음 여부 설정
-            newNote.deleteYN = atoi(tokens[5]);  // 삭제 여부 설정
-            strcpy(newNote.sendTime, tokens[6]); // 전송 시간 설정
+            Note newNote;
+            newNote.index = index;
+            strcpy(newNote.sender, sender);
+            strcpy(newNote.receiver, receiver);
+            strcpy(newNote.content, content);
+            newNote.readYN = readYN;
+            newNote.deleteYN = deleteYN;
+            strcpy(newNote.sendTime, sendTime);
+        
+            note_list[note_count].index = index;
+            strcpy(note_list[note_count].sender,sender);
+            strcpy(note_list[note_count].receiver, receiver);
+            strcpy(note_list[note_count].content, content);
+            note_list[note_count].readYN = readYN;
+            note_list[note_count].deleteYN = deleteYN;
+            strcpy(note_list[note_count].sendTime, sendTime);
+            note_count++;
 
             // 파일에 데이터 추가
-            add_note_to_file(&newNote); // 새로운 쪽지를 파일에 추가
-            free(message_copy);         // 메모리 해제
+            add_note_to_file(&newNote);
+
+            for (int i = 0; i < clnt_cnt; i++)
+            {
+                if (strcmp(newNote.receiver, clients[i].username) == 0)
+                {
+                    char full_msg[BUF_SIZE]; // 전체 메시지를 저장할 버퍼
+                    snprintf(full_msg, sizeof(full_msg), "%s쪽지가 도착했습니다. 쪽지함을 확인하세요.%s\n", BLUE, END);
+                    send(clients[i].sock, full_msg, sizeof(full_msg), 0);
+                    break;
+                }
+            }
         }
         else if (strncmp(msg, "/note_check", 11) == 0)
         {
@@ -582,13 +661,13 @@ void *handle_clnt(void *arg)
                     list[idx].readYN = user_note_list[i].readYN;
                     list[idx].deleteYN = user_note_list[i].deleteYN;
                     strcpy(list[idx].sendTime, user_note_list[i].sendTime);
-                    // printf("DeleteYN: %d\n", list[idx].deleteYN);
-                    // printf("ReadYN: %d\n", list[idx].readYN);
-                    // printf("Content: %s\n", list[idx].content);
-                    // printf("Receiver: %s\n", list[idx].receiver);
-                    // printf("Sender: %s\n", list[idx].sender);
-                    // printf("Index: %d\n", list[idx].index);
-                    // printf("SendTime: %s\n", list[idx].sendTime);
+                    printf("DeleteYN: %d\n", list[idx].deleteYN);
+                    printf("ReadYN: %d\n", list[idx].readYN);
+                    printf("Content: %s\n", list[idx].content);
+                    printf("Receiver: %s\n", list[idx].receiver);
+                    printf("Sender: %s\n", list[idx].sender);
+                    printf("Index: %d\n", list[idx].index);
+                    printf("SendTime: %s\n", list[idx].sendTime);
                     idx++;
                 }
             }
@@ -676,7 +755,8 @@ void *handle_clnt(void *arg)
                     printf("read_token이 NULL이거나 잘못된 형식입니다: '%s'\n", action_token); // 오류 메시지 출력
                 }
 
-                printf("끝!\n"); // 끝 메시지 출력
+                printf("끝!\n");                      // 끝 메시지 출력
+                write(clnt_sock, "끝", sizeof("끝")); // 메시지 전송
             }
         }
         else // 그 외의 메시지인 경우
@@ -715,7 +795,7 @@ void send_msg(const char *msg, int len, const char *sender)
 {
     pthread_mutex_lock(&mutx);
 
-    if (sender == "Server") // 전체 공지
+    if (strcmp(sender, "Server") == 0) // 전체 공지
     {
         for (int i = 0; i < clnt_cnt; i++)
         {
@@ -724,19 +804,21 @@ void send_msg(const char *msg, int len, const char *sender)
     }
     else // 메시지를 보낸 클라이언트를 제외하고, 같은 채팅방에 있는 사람에게 메시지 전달
     {
-        int room = 0;
+        int room = -1; // 기본값으로 방 번호를 -1로 설정
         for (int i = 0; i < clnt_cnt; i++)
         {
-            if (clients[i].username == sender)
+            if (strcmp(clients[i].username, sender) == 0) // 문자열 비교 수정
             {
                 room = clients[i].roomnumber;
+                break; // 방 번호를 찾으면 루프 종료
             }
         }
+
         for (int i = 0; i < clnt_cnt; i++)
         {
-            if (strcpy(clients[i].username, sender) && clients[i].roomnumber == room)
+            if (strcmp(clients[i].username, sender) != 0 && clients[i].roomnumber == room) // 보낸 클라이언트를 제외
             {
-                write(clients[i].sock, msg, len);
+                write(clients[i].sock, msg, len); // 메시지 전송
             }
         }
     }
@@ -1148,13 +1230,13 @@ void add_note_to_file(Note *note)
 int unoccupiedNum()
 {
     int chk = -1;
-    for(int i=1; i<11; i++)
+    for (int i = 1; i < 11; i++)
     {
-        if(chatrms[i].usercount == 0)
+        if (chatrms[i].usercount == 0)
         {
             return i;
         }
     }
-    
+
     return chk;
 }

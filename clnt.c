@@ -16,11 +16,12 @@
 // 색상 코드 정의
 #define RED "\033[31m"
 #define RED_BOLD "\033[1;31m"
-#define BLUE "\033[34m"
-#define PURPLE "\033[47m"
-#define GREY "\033[1;30m"
-#define PURPLE_BOLD "\033[1;35m"
-#define GREEN "\033[38;2;35;101;51m"
+#define BLUE "\033[1;34m"
+#define PINK "\033[1;38;2;255;105;180m" // 핑크색
+#define ORANGE "\033[1;38;2;255;165;0m" // 주황색
+#define PURPLE "\033[1;35m"
+#define GREEN "\033[1;38;2;35;101;51m"
+#define DARK_GRAY "\033[1;38;2;169;169;169m" // 짙은 회색
 #define BOLD "\033[1;0m"
 #define END "\033[0m"
 
@@ -53,7 +54,6 @@ Note *handle_notes(Note *notes, size_t count, int sock);
 void display_notes(Note *notes, size_t count);
 int send_note(int sock, Note *note);
 int get_next_index();
-void createRoom(int sock);
 
 int main(int argc, char *argv[])
 {
@@ -245,6 +245,7 @@ void *send_msg(void *arg) // send thread main
         }
         else if (strcmp(message, "/makeroom\n") == 0)
         {
+            // printf("/makeroom 입력\n");
             if (currentroom == 0)
             {
                 write(sock, "/makeroom", strlen("/makeroom"));
@@ -257,15 +258,23 @@ void *send_msg(void *arg) // send thread main
         }
         else if (strcmp(message, "/room\n") == 0)
         {
+            // printf("/room 입력\n");
             write(sock, "/room", strlen("/room"));
         }
         else if (strcmp(message, "/leaveroom\n") == 0)
         {
+            // printf("/leaveroom 입력\n");
             write(sock, "/leaveroom", strlen("/leaveroom"));
         }
-        else if (strcmp(message, "/leaveroom\n") == 0)
+        else if (strncmp(message, "/invite ", 8) == 0)
         {
-            write(sock, "/leaveroom", strlen("/leaveroom"));
+            // printf("/invite 입력\n");
+            write(sock, message, strlen(message));
+        }
+        else if (strncmp(message, "/inroom ", 8) == 0)
+        {
+            // printf("/inroom 입력\n");
+            write(sock, message, strlen(message));
         }
         else
         {
@@ -280,7 +289,6 @@ void *recv_msg(void *arg) // read thread main
     int sock = *((int *)arg);
     char message[BUF_SIZE * 2]; // 버퍼 크기를 2배로 늘림
     int str_len;
-
     while (1)
     {
         str_len = read(sock, message, sizeof(message) - 1);
@@ -297,11 +305,14 @@ void *recv_msg(void *arg) // read thread main
         }
 
         message[str_len] = '\0'; // 수신된 메시지를 Null로 종료
-        fputs(message, stdout);  // 메시지를 출력
+
+        printf(message, stdout); // 메시지를 출력
 
         if (strncmp(message, "로그아웃 성공", 5) == 0)
         {
             printf("서버에서 로그아웃 허락 받았어!!\n");
+
+            system("clear");
             break;
         }
         else if (strncmp(message, "note_send", 10) == 0)
@@ -379,55 +390,132 @@ void *recv_msg(void *arg) // read thread main
 
             free(arr);
         }
+        else if (strcmp(message, "끝") == 0)
+        {
+            fflush(stdout);
+            system("clear");
+        }
         else if (strncmp(message, "/makeroom", 9) == 0)
         {
-            /* '/makeroom' 제거 및 숫자 변환 */
             const char *command = "/makeroom";
             size_t commandLength = strlen(command);
 
-            // message가 '/makeroom'으로 시작하는지 확인
-            if (strncmp(message, command, commandLength) == 0)
+            char *numStr = (char *)message + commandLength;
+            while (*numStr == ' ')
+                numStr++; // 공백 건너뛰기
+            // // 개행 문자 제거
+            // size_t len = strlen(numStr);
+            // if (len > 0 && numStr[len - 1] == '\n')
+            // {
+            //     numStr[len - 1] = '\0';
+            // }
+            printf("Received message: '%s'\n", message); // 수신한 메시지 확인
+            if (strlen(numStr) > 0)
             {
-                char *numStr = (char *)message + commandLength; // 명령어 뒤의 숫자 부분
-        
-                if ( atoi(numStr) > 10)
-                {
-                    printf("최대 방 수를 초과했습니다. 방을 더 이상 만들 수 없습니다.");
-                    break;
-                }
-                else
-                {
-                    currentroom = atoi(numStr); // 숫자로 변환
-                    printf("%s채팅방%s에 입장했습니다.%s\n", RED_BOLD, numStr, END);
-                }
+                int currentroom = atoi(numStr);
+                printf("[makeroom종료시점] currentroom : %d\n", currentroom);
+                fflush(stdout);
+                system("clear");
+                printf("\n%s%d번 채팅방에 입장했습니다.%s\n", PINK, currentroom, END);
+            }
+            else
+            {
+                fflush(stdout);
+                system("clear");
+                printf("\n%s방 번호가 없습니다.%s\n", BLUE, END);
             }
         }
-        else if (strncmp(message, "/leaveroom", 10) == 0)
+        else if (strncmp(message, "/leave", 6) == 0)
         {
-            /* '/leaveroom' 제거 및 숫자 변환 */
-            const char *command = "/leaveroom";
+            const char *command = "/leave";
             size_t commandLength = strlen(command);
 
-            // message가 '/leaveroom'으로 시작하는지 확인
+            // 메시지에서 '/leave'를 확인
             if (strncmp(message, command, commandLength) == 0)
             {
-                char *numStr = (char *)message + commandLength; // 명령어 뒤의 숫자 부분
-                
-                if (atoi(numStr) == 0)
+                char *leaveStr = (char *)message + commandLength;
+                while (*leaveStr == ' ')
+                    leaveStr++; // 공백 건너뛰기
+
+                // leaveStr에서 숫자 부분을 추출
+                int roomNumber = atoi(leaveStr);
+                currentroom = roomNumber; // currentroom에 방 번호 대입
+                fflush(stdout);
+                system("clear");
+                printf("%s채팅방에서 나갔습니다. 현재 방 번호: %d%s\n", PINK, currentroom, END);
+            }
+        }
+        else if (strncmp(message, "/invite ", 8) == 0)
+        {
+            char *command, *inviteInfo;
+
+            // "/invite " 명령어 분리
+            command = strtok(message, " "); // 첫 번째 토큰은 "/invite"
+            inviteInfo = strtok(NULL, "");  // 나머지는 초대 정보
+
+            if (inviteInfo != NULL)
+            {
+                currentroom = atoi(inviteInfo);
+                printf("[invite종료시점] currentroom : %d\n", currentroom);
+
+                // 초대 성공 메시지 처리
+                if (strcmp(inviteInfo, "사용자없음") == 0)
                 {
-                    currentroom = atoi(numStr); // 숫자로 변환
-                    printf("%s전체 채팅방에 입장했습니다.%s\n", RED_BOLD, END);
+                    printf("%s사용자 이름을 찾을 수 없습니다.%s\n", RED_BOLD, END);
                 }
                 else
                 {
-                    printf("오류\n");
-                    break;
+                    printf("%s님이 성공적으로 초대되었습니다. 현재 방 번호는 %d입니다.\n", inviteInfo, currentroom);
                 }
             }
+            else
+            {
+                printf("초대 정보를 처리하는 중 오류가 발생했습니다.\n");
+            }
         }
-        else if (strncmp(message, "/inviteroom", 11) == 0)
+        else if (strncmp(message, "/roomList ", 10) == 0)
         {
-            
+            char *command, *roomInfo;
+
+            // "/roomList " 분리
+            command = strtok(message, " "); // 첫 번째 토큰은 "/roomList"
+            roomInfo = strtok(NULL, "");    // 나머지는 방 정보
+            int chk = 0;
+            // 방 정보를 분리하고 출력
+            if (roomInfo != NULL)
+            {
+                char *token = strtok(roomInfo, " "); // 각 방 정보를 공백으로 분리
+                printf("\n===================================\n");
+                while (token != NULL)
+                {
+                    int roomNumber, userCount;
+                    sscanf(token, "%d,%d", &roomNumber, &userCount); // 콤마로 분리하여 방 번호와 사용자 수 추출
+                    // printf("방 번호: %d, 참여 인원: %d\n", roomNumber, userCount);
+                    if (userCount != 0 && roomNumber < 10)
+                    {
+                        printf(" [방%d]\n", roomNumber);
+                        printf(" 참여 인원: %d명\n", userCount);
+                        printf("-----------------------------------\n");
+                        chk = 1;
+                    }
+                    else if (userCount != 0 && roomNumber == 10)
+                    {
+                        printf(" [방%d]\n", roomNumber);
+                        printf(" 참여 인원: %d명\n", userCount);
+                        chk = 1;
+                    }
+                    token = strtok(NULL, " "); // 다음 방 정보로 이동
+                }
+                if (chk == 0)
+                {
+                    printf("%s       생성된 방이 없습니다.%s\n", BLUE, END);
+                }
+                printf("===================================\n");
+            }
+            else
+            {
+                printf("방 정보가 없습니다.\n");
+            }
         }
     }
 
@@ -463,9 +551,9 @@ void show_note_menu(int sock)
     char input[BUF_SIZE];
 
     // 메뉴 출력
-    printf("1. 쪽지 보내기\n");
-    printf("2. 쪽지 확인하기\n");
-    printf("3. 취소\n");
+    printf("%s1. 쪽지 보내기%s\n", BLUE, END);
+    printf("%s2. 쪽지 확인하기%s\n", BLUE, END);
+    printf("%s3. 취소%s\n", BLUE, END);
     printf("선택하세요: ");
 
     // 사용자 입력 받기
@@ -544,7 +632,7 @@ void show_note_menu(int sock)
 
 Note *handle_notes(Note *notes, size_t count, int sock)
 {
-    // sleep(2); // 잠시 대기
+    sleep(2); // 잠시 대기
     int check = 1000;
 
     while (check != 0)
@@ -557,15 +645,14 @@ Note *handle_notes(Note *notes, size_t count, int sock)
         system("clear");
         puts("\n* * * * 받은 쪽지함 * * * *\n");
 
-        // Display notes (function implementation not provided)
         display_notes(notes, count);
 
-        puts("쪽지번호 : 삭제 , 0 : 닫기");
-        printf("\n입력: ");
+        printf("%s삭제 : 쪽지 번호 입력, 쪽지함 닫기 : 0 입력\n%s", BLUE, END);
+        printf("입력: ");
         fflush(stdout);
-        // scanf("%d", &check);
+        scanf("%d", &check);
         // while (getchar() != '\n')
-        //     ; // Clear input buffer
+        //     ;
 
         if (check > 0 && check <= (int)count)
         {
@@ -607,7 +694,7 @@ void display_notes(Note *notes, size_t count)
             }
             // 쪽지 정보 출력
             printf("%s[To. %s]%s\n", BOLD, notes[i].sender, END);
-            printf("%s%s%s\n", GREY, notes[i].content, END);
+            printf("%s%s%s\n", DARK_GRAY, notes[i].content, END);
             printf("%s\n", notes[i].sendTime);
             printf("==============================================\n");
         }
@@ -650,9 +737,11 @@ int send_note(int sock, Note *note)
     else
     {
         printf("Note sent to server: %s\n", message); // 전송된 메시지 출력
-        return 0;                                     // 성공적으로 전송됨
     }
+
+    return 0; // 성공적으로 전송됨
 }
+
 
 int get_next_index()
 {
@@ -675,8 +764,4 @@ int get_next_index()
     }
     fclose(file);
     return last_index + 1;
-}
-
-void createRoom(int sock)
-{
 }
